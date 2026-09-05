@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - PremDigi Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    const saved = localStorage.getItem("premdigi-theme");
+    const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi Admin</a>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <a href="index.html" class="back-link">&larr; Back to store</a>
+  <h2>Orders</h2>
+
+  <div id="admin-login" class="login-card">
+    <p>Enter the admin credentials to view orders.</p>
+    <form id="login-form">
+      <input type="text" id="login-user" placeholder="Username" autocomplete="username" required>
+      <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
+      <button type="submit" class="btn btn-primary btn-block">View Orders</button>
+    </form>
+    <p id="login-error" class="status-message error" hidden></p>
+  </div>
+
+  <div id="admin-summary" class="admin-summary" hidden></div>
+  <div id="orders-content" hidden></div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const AUTH_KEY = "premdigi-admin-auth";
+
+  function getStoredAuth() {
+    return sessionStorage.getItem(AUTH_KEY);
+  }
+
+  function setStoredAuth(value) {
+    if (value) sessionStorage.setItem(AUTH_KEY, value);
+    else sessionStorage.removeItem(AUTH_KEY);
+  }
+
+  async function fetchOrders(authHeader) {
+    let res;
+    try {
+      res = await fetch(`${API_BASE_URL}/api/orders`, { headers: { Authorization: authHeader } });
+    } catch (e) {
+      throw new Error("network");
+    }
+    if (res.status === 401) throw new Error("unauthorized");
+    if (!res.ok) throw new Error("failed");
+    return res.json();
+  }
+
+  function showLogin(errorMessage) {
+    document.getElementById("admin-login").hidden = false;
+    document.getElementById("admin-summary").hidden = true;
+    document.getElementById("orders-content").hidden = true;
+    const err = document.getElementById("login-error");
+    if (errorMessage) {
+      err.textContent = errorMessage;
+      err.hidden = false;
+    } else {
+      err.hidden = true;
+    }
+  }
+
+  function showOrders() {
+    document.getElementById("admin-login").hidden = true;
+    document.getElementById("admin-summary").hidden = false;
+    document.getElementById("orders-content").hidden = false;
+  }
+
+  function renderOrders(orders) {
+    const summary = document.getElementById("admin-summary");
+    const container = document.getElementById("orders-content");
+
+    if (orders.length === 0) {
+      summary.innerHTML = "";
+      container.innerHTML = `<div class="empty-cart">No orders yet.</div>`;
+      return;
+    }
+
+    const revenue = orders.reduce((sum, o) => sum + o.total, 0);
+    summary.innerHTML = `
+      <div class="summary-card"><span>Total Orders</span><strong>${orders.length}</strong></div>
+      <div class="summary-card"><span>Total Revenue</span><strong>$${revenue.toFixed(2)}</strong></div>
+    `;
+
+    container.innerHTML = `
+      <div class="orders-table-wrapper">
+        <div class="orders-table">
+          <div class="orders-row orders-head">
+            <div>Date</div>
+            <div>Customer</div>
+            <div>Items</div>
+            <div>Order ID</div>
+            <div>Total</div>
+          </div>
+          ${orders.map(o => `
+            <div class="orders-row">
+              <div>${new Date(o.createdAt).toLocaleString()}</div>
+              <div>
+                <div class="orders-customer-name">${o.payerName || "—"}</div>
+                <div class="orders-customer-email">${o.payerEmail || ""}</div>
+              </div>
+              <div>${o.items.map(i => `${i.name} &times;${i.qty}`).join("<br>")}</div>
+              <div class="orders-id">${o.id}</div>
+              <div class="orders-total">$${o.total.toFixed(2)}</div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  async function tryLoad(authHeader) {
+    try {
+      const orders = await fetchOrders(authHeader);
+      setStoredAuth(authHeader);
+      showOrders();
+      renderOrders(orders);
+      return null;
+    } catch (e) {
+      return e.message;
+    }
+  }
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = document.getElementById("login-user").value;
+    const pass = document.getElementById("login-pass").value;
+    const header = "Basic " + btoa(`${user}:${pass}`);
+
+    const reason = await tryLoad(header);
+    if (reason === "unauthorized") showLogin("Invalid username or password.");
+    else if (reason === "network") showLogin("Could not reach the server. Make sure node server.js is running.");
+    else if (reason) showLogin("Something went wrong. Please try again.");
+  });
+
+  (async function init() {
+    const stored = getStoredAuth();
+    if (!stored) {
+      showLogin();
+      return;
+    }
+    const reason = await tryLoad(stored);
+    if (reason === "unauthorized") {
+      setStoredAuth(null);
+      showLogin();
+    } else if (reason) {
+      showLogin();
+    }
+  })();
+</script>
+
+</body>
+</html>

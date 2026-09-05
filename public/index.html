@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PremDigi Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  // Set theme before paint to avoid a flash of the wrong theme.
+  (function () {
+    const saved = localStorage.getItem("premdigi-theme");
+    const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi Store</a>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+      <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
+        <span id="cart-icon"></span>
+        <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Digital Trading Resources</h1>
+    <p>Instant downloads. Secure checkout with PayPal, priced in USD.</p>
+  </div>
+</section>
+
+<main>
+  <h2>All Products</h2>
+  <div class="product-grid" id="product-grid"></div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
+</footer>
+
+<script src="js/products.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const grid = document.getElementById("product-grid");
+
+  PRODUCTS.forEach(product => {
+    const card = document.createElement("div");
+    card.className = `product-card cat-${product.category}`;
+
+    card.innerHTML = `
+      <a class="card-link" href="product.html?id=${encodeURIComponent(product.id)}">
+        <div class="product-icon cat-${product.category}">${ICONS[product.icon] || ""}</div>
+        <span class="product-badge cat-${product.category}">${CATEGORY_LABELS[product.category] || "Digital Download"}</span>
+        <div class="product-name">${product.name}</div>
+        <div class="product-price">$${product.price.toFixed(2)}</div>
+      </a>
+      <button class="btn btn-secondary btn-block add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      addToCart(btn.dataset.id, 1);
+      const original = btn.textContent;
+      btn.textContent = "Added ✓";
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    });
+  });
+</script>
+
+</body>
+</html>

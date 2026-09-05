@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart - PremDigi Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    const saved = localStorage.getItem("premdigi-theme");
+    const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi Store</a>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+      <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
+        <span id="cart-icon"></span>
+        <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <a href="index.html" class="back-link">&larr; Continue shopping</a>
+  <h2>Your Cart</h2>
+  <div id="cart-content"></div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/products.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  // "sb" is PayPal's public sandbox client ID, for testing only.
+  // Replace it with your own Client ID from https://developer.paypal.com/dashboard/applications
+  // before accepting real payments.
+  const PAYPAL_CLIENT_ID = "sb";
+  let paypalSdkLoaded = false;
+  let paypalSdkLoading = false;
+
+  function loadPaypalSdk(callback) {
+    if (paypalSdkLoaded) return callback();
+    if (paypalSdkLoading) {
+      document.addEventListener("paypal-sdk-ready", callback, { once: true });
+      return;
+    }
+    paypalSdkLoading = true;
+    const script = document.createElement("script");
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+    script.onload = () => {
+      paypalSdkLoaded = true;
+      document.dispatchEvent(new Event("paypal-sdk-ready"));
+      callback();
+    };
+    script.onerror = () => {
+      const status = document.getElementById("status-message");
+      if (status) {
+        status.textContent = "Could not load PayPal. Please check your connection and try again.";
+        status.classList.add("error");
+      }
+    };
+    document.body.appendChild(script);
+  }
+
+  function getCartItems() {
+    return getCart()
+      .map(ci => {
+        const product = PRODUCTS.find(p => p.id === ci.id);
+        return product ? { ...product, qty: ci.qty } : null;
+      })
+      .filter(Boolean);
+  }
+
+  function renderCart() {
+    const container = document.getElementById("cart-content");
+    const items = getCartItems();
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="empty-cart">Your cart is empty. <a href="index.html">Browse products</a></div>`;
+      return;
+    }
+
+    const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+    container.innerHTML = `
+      <div class="cart-table">
+        ${items.map(i => `
+          <div class="cart-row" data-id="${i.id}">
+            <div class="cart-row-icon cat-${i.category}">${ICONS[i.icon] || ""}</div>
+            <div class="cart-row-info">
+              <div class="cart-row-name">${i.name}</div>
+              <div class="cart-row-price">$${i.price.toFixed(2)} each</div>
+            </div>
+            <div class="qty-stepper">
+              <button class="qty-btn" data-action="minus" data-id="${i.id}" type="button">&minus;</button>
+              <input type="number" class="qty-input" min="1" value="${i.qty}" data-id="${i.id}">
+              <button class="qty-btn" data-action="plus" data-id="${i.id}" type="button">+</button>
+            </div>
+            <div class="cart-row-total">$${(i.price * i.qty).toFixed(2)}</div>
+            <button class="remove-btn" data-id="${i.id}" aria-label="Remove">&times;</button>
+          </div>
+        `).join("")}
+      </div>
+      <div class="cart-summary">
+        <div class="cart-subtotal"><span>Subtotal</span> <strong>$${subtotal.toFixed(2)}</strong></div>
+        <div id="paypal-button-container"></div>
+        <div id="status-message" class="status-message"></div>
+      </div>
+    `;
+
+    container.querySelectorAll(".qty-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cart = getCart();
+        const item = cart.find(i => i.id === btn.dataset.id);
+        if (!item) return;
+        item.qty = btn.dataset.action === "plus" ? item.qty + 1 : Math.max(1, item.qty - 1);
+        saveCart(cart);
+        renderCart();
+      });
+    });
+
+    container.querySelectorAll(".qty-input").forEach(input => {
+      input.addEventListener("change", () => {
+        updateCartQty(input.dataset.id, input.value);
+        renderCart();
+      });
+    });
+
+    container.querySelectorAll(".remove-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        removeFromCart(btn.dataset.id);
+        renderCart();
+      });
+    });
+
+    loadPaypalSdk(renderPaypalButton);
+  }
+
+  function renderPaypalButton() {
+    const target = document.getElementById("paypal-button-container");
+    if (!target) return;
+
+    paypal.Buttons({
+      style: {
+        layout: "vertical",
+        color: "gold",
+        shape: "rect",
+        label: "paypal"
+      },
+      createOrder: (data, actions) => {
+        const items = getCartItems();
+        const total = items.reduce((sum, i) => sum + i.price * i.qty, 0).toFixed(2);
+        return actions.order.create({
+          purchase_units: [{
+            description: `PremDigi Store order (${items.length} item${items.length > 1 ? "s" : ""})`,
+            amount: {
+              currency_code: "USD",
+              value: total,
+              breakdown: {
+                item_total: { currency_code: "USD", value: total }
+              }
+            },
+            items: items.map(i => ({
+              name: i.name,
+              unit_amount: { currency_code: "USD", value: i.price.toFixed(2) },
+              quantity: i.qty.toString()
+            }))
+          }]
+        });
+      },
+      onApprove: (data, actions) => {
+        return actions.order.capture().then((details) => {
+          const items = getCartItems();
+          const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+          fetch(`${API_BASE_URL}/api/orders`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paypalOrderId: details.id,
+              payerName: `${details.payer.name.given_name} ${details.payer.name.surname || ""}`.trim(),
+              payerEmail: details.payer.email_address,
+              items: items.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
+              total,
+              currency: "USD"
+            })
+          }).catch(() => {});
+
+          clearCart();
+          const container = document.getElementById("cart-content");
+          container.innerHTML = `<div class="empty-cart">
+            <p class="status-message success">Payment successful! Thank you, ${details.payer.name.given_name}.</p>
+            <a href="index.html">Continue shopping</a>
+          </div>`;
+        });
+      },
+      onError: (err) => {
+        console.error(err);
+        const status = document.getElementById("status-message");
+        if (status) {
+          status.textContent = "Something went wrong with the payment. Please try again.";
+          status.classList.add("error");
+        }
+      }
+    }).render("#paypal-button-container");
+  }
+
+  renderCart();
+</script>
+
+</body>
+</html>

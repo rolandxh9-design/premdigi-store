@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product - PremDigi Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    const saved = localStorage.getItem("premdigi-theme");
+    const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi Store</a>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+      <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
+        <span id="cart-icon"></span>
+        <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <a href="index.html" class="back-link">&larr; Back to all products</a>
+  <div id="product-container"></div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/products.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get("id");
+  const product = PRODUCTS.find(p => p.id === productId);
+  const container = document.getElementById("product-container");
+
+  if (!product) {
+    container.innerHTML = `<div class="not-found"><h2>Product not found</h2><p>It may have been removed.</p></div>`;
+  } else {
+    container.innerHTML = `
+      <div class="product-detail">
+        <div class="product-icon cat-${product.category}">${ICONS[product.icon] || ""}</div>
+        <div class="product-info">
+          <span class="product-badge cat-${product.category}">${CATEGORY_LABELS[product.category] || "Digital Download"}</span>
+          <h1>${product.name}</h1>
+          <div class="price">$${product.price.toFixed(2)}</div>
+          <p class="description">${product.description}</p>
+
+          <div class="purchase-row">
+            <div class="qty-stepper">
+              <button id="qty-minus" class="qty-btn" type="button">&minus;</button>
+              <input id="qty-input" class="qty-input" type="number" min="1" value="1">
+              <button id="qty-plus" class="qty-btn" type="button">+</button>
+            </div>
+            <button id="add-to-cart-btn" class="btn btn-secondary">Add to Cart</button>
+          </div>
+
+          <div id="paypal-button-container"></div>
+          <div id="status-message" class="status-message"></div>
+        </div>
+      </div>
+    `;
+
+    const qtyInput = document.getElementById("qty-input");
+    document.getElementById("qty-minus").addEventListener("click", () => {
+      qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1);
+    });
+    document.getElementById("qty-plus").addEventListener("click", () => {
+      qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1;
+    });
+    qtyInput.addEventListener("change", () => {
+      qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+    });
+
+    document.getElementById("add-to-cart-btn").addEventListener("click", (e) => {
+      addToCart(product.id, parseInt(qtyInput.value, 10) || 1);
+      const btn = e.currentTarget;
+      const original = btn.textContent;
+      btn.textContent = "Added ✓";
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    });
+
+    // ---- PayPal integration ----
+    // "sb" is PayPal's public sandbox client ID, for testing only.
+    // Replace it with your own Client ID from https://developer.paypal.com/dashboard/applications
+    // before accepting real payments.
+    const PAYPAL_CLIENT_ID = "sb";
+
+    const sdkScript = document.createElement("script");
+    sdkScript.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+    sdkScript.onload = renderPayPalButton;
+    sdkScript.onerror = () => {
+      const status = document.getElementById("status-message");
+      status.textContent = "Could not load PayPal. Please check your connection and try again.";
+      status.classList.add("error");
+    };
+    document.body.appendChild(sdkScript);
+
+    function renderPayPalButton() {
+      paypal.Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal"
+        },
+        createOrder: (data, actions) => {
+          const qty = parseInt(qtyInput.value, 10) || 1;
+          const total = (product.price * qty).toFixed(2);
+          return actions.order.create({
+            purchase_units: [{
+              description: `${product.name} x${qty}`,
+              amount: {
+                currency_code: "USD",
+                value: total,
+                breakdown: {
+                  item_total: { currency_code: "USD", value: total }
+                }
+              },
+              items: [{
+                name: product.name,
+                unit_amount: { currency_code: "USD", value: product.price.toFixed(2) },
+                quantity: qty.toString()
+              }]
+            }]
+          });
+        },
+        onApprove: (data, actions) => {
+          return actions.order.capture().then((details) => {
+            const qty = parseInt(qtyInput.value, 10) || 1;
+            fetch(`${API_BASE_URL}/api/orders`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                paypalOrderId: details.id,
+                payerName: `${details.payer.name.given_name} ${details.payer.name.surname || ""}`.trim(),
+                payerEmail: details.payer.email_address,
+                items: [{ id: product.id, name: product.name, qty, price: product.price }],
+                total: product.price * qty,
+                currency: "USD"
+              })
+            }).catch(() => {});
+
+            const status = document.getElementById("status-message");
+            status.textContent = `Payment successful! Thank you, ${details.payer.name.given_name}.`;
+            status.classList.add("success");
+          });
+        },
+        onError: (err) => {
+          console.error(err);
+          const status = document.getElementById("status-message");
+          status.textContent = "Something went wrong with the payment. Please try again.";
+          status.classList.add("error");
+        }
+      }).render("#paypal-button-container");
+    }
+  }
+</script>
+
+</body>
+</html>
