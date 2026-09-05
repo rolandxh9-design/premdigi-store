@@ -6,6 +6,7 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
+const { MongoClient } = require("mongodb");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,13 +15,29 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_USER = process.env.ADMIN_USER || "admin";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "changeme";
 
-// DATA_DIR lets a host mount a persistent volume somewhere other than the
-// app's own folder (which is usually rebuilt/wiped on every deploy) — e.g.
-// set DATA_DIR=/data on Northflank and mount the volume at /data.
+// Order storage: MongoDB Atlas (free M0 tier) when MONGODB_URI is set — this is
+// what production should use, since most hosts' local disks don't survive
+// restarts. Without it, orders are kept in a local JSON file, which is fine
+// for local development but NOT for a real deploy (the file can be wiped on
+// every restart/redeploy depending on the host).
+const MONGODB_URI = process.env.MONGODB_URI;
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
 
-function readOrders() {
+let ordersCollection = null;
+
+async function initStorage() {
+  if (!MONGODB_URI) {
+    console.log("MONGODB_URI not set — using local file storage (fine for local dev only).");
+    return;
+  }
+  const client = new MongoClient(MONGODB_URI);
+  await client.connect();
+  ordersCollection = client.db("premdigi").collection("orders");
+  console.log("Connected to MongoDB for order storage.");
+}
+
+function readOrdersFile() {
   try {
     return JSON.parse(fs.readFileSync(ORDERS_FILE, "utf8"));
   } catch (e) {
@@ -28,9 +45,27 @@ function readOrders() {
   }
 }
 
-function writeOrders(orders) {
+function writeOrdersFile(orders) {
   fs.mkdirSync(path.dirname(ORDERS_FILE), { recursive: true });
   fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+}
+
+async function getAllOrders() {
+  if (ordersCollection) {
+    const docs = await ordersCollection.find().sort({ createdAt: -1 }).toArray();
+    return docs.map(({ _id, ...order }) => order);
+  }
+  return readOrdersFile();
+}
+
+async function saveOrder(order) {
+  if (ordersCollection) {
+    await ordersCollection.insertOne(order);
+    return;
+  }
+  const orders = readOrdersFile();
+  orders.unshift(order);
+  writeOrdersFile(orders);
 }
 
 function requireAdminAuth(req, res, next) {
@@ -41,16 +76,16 @@ function requireAdminAuth(req, res, next) {
 }
 
 // Allows the storefront to be hosted on a different domain (e.g. Netlify)
-// from this API server (e.g. Render/Railway). The public order-logging
-// endpoint is harmless to open widely; the orders GET stays behind its
-// own password check regardless of origin.
+// from this API server (e.g. Render). The public order-logging endpoint is
+// harmless to open widely; the orders GET stays behind its own password
+// check regardless of origin.
 app.use(cors());
 app.use(express.json());
 
 // admin.html itself is a plain static page (just a login form + empty
 // table shell) — the real protection is here, on the data endpoint.
-app.get("/api/orders", requireAdminAuth, (req, res) => {
-  res.json(readOrders());
+app.get("/api/orders", requireAdminAuth, async (req, res) => {
+  res.json(await getAllOrders());
 });
 
 // Public: called right after a PayPal capture succeeds, to log the order.
@@ -58,7 +93,7 @@ app.get("/api/orders", requireAdminAuth, (req, res) => {
 // can POST a fabricated order. For real production use, verify the order
 // server-side against PayPal's Orders API (using your client secret) before
 // trusting it — this simple version is meant for getting started quickly.
-app.post("/api/orders", (req, res) => {
+app.post("/api/orders", async (req, res) => {
   const { paypalOrderId, payerName, payerEmail, items, total, currency } = req.body || {};
 
   if (!paypalOrderId || !Array.isArray(items) || items.length === 0 || typeof total !== "number") {
@@ -80,9 +115,7 @@ app.post("/api/orders", (req, res) => {
     currency: String(currency || "USD").slice(0, 10)
   };
 
-  const orders = readOrders();
-  orders.unshift(order);
-  writeOrders(orders);
+  await saveOrder(order);
   res.status(201).json({ ok: true });
 });
 
@@ -90,10 +123,18 @@ app.post("/api/orders", (req, res) => {
 // .env, and data/orders.json (customer names/emails) stay off-limits.
 app.use(express.static(path.join(__dirname, "public")));
 
-app.listen(PORT, () => {
-  console.log(`PremDigi Store running at http://localhost:${PORT}`);
-  console.log(`Admin panel at http://localhost:${PORT}/admin.html (user: ${ADMIN_USER})`);
-  if (ADMIN_PASSWORD === "changeme") {
-    console.log("WARNING: using the default admin password — set ADMIN_USER / ADMIN_PASSWORD env vars before deploying.");
-  }
-});
+initStorage()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`PremDigi Store running at http://localhost:${PORT}`);
+      console.log(`Admin panel at http://localhost:${PORT}/admin.html (user: ${ADMIN_USER})`);
+      if (ADMIN_PASSWORD === "changeme") {
+        console.log("WARNING: using the default admin password — set ADMIN_USER / ADMIN_PASSWORD env vars before deploying.");
+      }
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MONGODB_URI — refusing to start with broken order storage.");
+    console.error(err.message);
+    process.exit(1);
+  });
