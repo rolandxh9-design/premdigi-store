@@ -41,9 +41,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.listen(PORT, () => {
   console.log(`PremDigi Store (local dev) running at http://localhost:${PORT}`);
   console.log(`Admin panel at http://localhost:${PORT}/admin.html (user: ${ADMIN_USER})`);
-  if (!process.env.MONGODB_URI) {
-    console.log("MONGODB_URI not set — using local file storage (fine for local dev only).");
-  }
+  console.log("Using local file storage for orders (Netlify Blobs is used automatically once deployed).");
   if (ADMIN_PASSWORD === "changeme") {
     console.log("WARNING: using the default admin password — set ADMIN_USER / ADMIN_PASSWORD env vars before deploying.");
   }
