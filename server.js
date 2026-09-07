@@ -1,5 +1,5 @@
 // Local development server only — the deployed site runs entirely on
-// Netlify (static files + the function in netlify/functions/orders.js).
+// Netlify (static files + the function in netlify/functions/orders.mjs).
 // This lets you run `npm start` and test the whole site, including the
 // order API, without needing the Netlify CLI.
 require("dotenv").config();
@@ -7,7 +7,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { getAllOrders, saveOrder, buildOrder, isValidAdminAuth, ADMIN_USER, ADMIN_PASSWORD } = require("./lib/orders");
+const { buildOrder, isValidAdminAuth, ADMIN_USER, ADMIN_PASSWORD } = require("./lib/order-utils");
+const { getAllOrders, saveOrder } = require("./lib/orders-file-store");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
