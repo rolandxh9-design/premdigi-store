@@ -8,19 +8,25 @@ import { getStore } from "@netlify/blobs";
 import { buildOrder, isValidAdminAuth } from "../../lib/order-utils.js";
 
 const BLOB_STORE_NAME = "premdigi-orders";
-const BLOB_KEY = "orders";
 
+// Each order is its own blob, keyed by its PayPal order ID. This avoids a
+// read-modify-write race on a single shared blob — two checkouts completing
+// at nearly the same moment would otherwise silently overwrite each other
+// (Netlify Blobs is last-write-wins with no built-in list concurrency).
 async function getAllOrders() {
   const store = getStore(BLOB_STORE_NAME);
-  const data = await store.get(BLOB_KEY, { type: "json" });
-  return data || [];
+  const { blobs } = await store.list();
+  const orders = await Promise.all(blobs.map(b => store.get(b.key, { type: "json" })));
+  // Filters out the old pre-migration "orders" blob (a single array under one
+  // key) and anything else malformed, alongside real per-order objects.
+  return orders
+    .filter(o => o && typeof o === "object" && !Array.isArray(o) && o.createdAt)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
 async function saveOrder(order) {
   const store = getStore(BLOB_STORE_NAME);
-  const orders = (await store.get(BLOB_KEY, { type: "json" })) || [];
-  orders.unshift(order);
-  await store.setJSON(BLOB_KEY, orders);
+  await store.setJSON(order.id, order, { onlyIfNew: true });
 }
 
 export default async (req) => {
