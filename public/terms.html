@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service - PremDigi</title>
+<meta name="description" content="PremDigi's Terms of Service — the rules for using our site and purchasing digital products.">
+<link rel="canonical" href="https://premdigi-store.netlify.app/terms.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    const saved = localStorage.getItem("premdigi-theme");
+    const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+  .legal-content { max-width: 720px; margin: 0 auto; }
+  .legal-content h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .legal-content .updated { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  .legal-content h2 { font-size: 1.1rem; margin: 2rem 0 0.75rem; }
+  .legal-content p, .legal-content li { color: var(--muted); line-height: 1.7; font-size: 0.95rem; }
+  .legal-content ul { padding-left: 1.25rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi</a>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+      <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
+        <span id="cart-icon"></span>
+        <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <a href="index.html" class="back-link">&larr; Back to store</a>
+  <div class="legal-content">
+    <h1>Terms of Service</h1>
+    <p class="updated">Last updated: September 2026</p>
+
+    <p>These Terms of Service ("Terms") govern your use of PremDigi ("we," "us," "our") and your purchase of any digital product listed on this site. By using this site or completing a purchase, you agree to these Terms.</p>
+
+    <h2>1. What We Sell</h2>
+    <p>PremDigi sells digital products related to crypto and forex trading, including e-books, courses, and automated trading bots. All products are digital and are described as accurately as possible on their individual product pages.</p>
+
+    <h2>2. Not Financial Advice</h2>
+    <p>Our products are educational and/or software tools. Nothing on this site constitutes financial, investment, or trading advice. Trading involves risk, and past performance does not guarantee future results. Only trade with money you can afford to lose.</p>
+
+    <h2>3. Orders and Payment</h2>
+    <p>All payments are processed securely through PayPal. We do not collect or store your card or payment details directly. Prices are listed in US Dollars (USD).</p>
+
+    <h2>4. Digital Delivery</h2>
+    <p>Digital products are delivered directly to you after your payment is confirmed. If you experience an issue receiving your product, contact us so we can resolve it.</p>
+
+    <h2>5. Refunds</h2>
+    <p>Because our products are delivered electronically, all sales are final. See our <a href="refund-policy.html">Refund Policy</a> for full details.</p>
+
+    <h2>6. Acceptable Use</h2>
+    <p>You agree not to resell, redistribute, or share purchased digital products without our permission, and not to use this site for any unlawful purpose.</p>
+
+    <h2>7. Changes to These Terms</h2>
+    <p>We may update these Terms from time to time. Continued use of the site after changes are posted means you accept the updated Terms.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/theme.js"></script>
+</body>
+</html>

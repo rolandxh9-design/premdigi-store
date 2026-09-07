@@ -7,7 +7,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { buildOrder, isValidAdminAuth, ADMIN_USER, ADMIN_PASSWORD } = require("./lib/order-utils");
+const { buildOrder, isValidAdminAuth, aggregateSalesByProduct, ADMIN_USER, ADMIN_PASSWORD } = require("./lib/order-utils");
 const { getAllOrders, saveOrder } = require("./lib/orders-file-store");
 
 const app = express();
@@ -33,6 +33,11 @@ app.post("/api/orders", async (req, res) => {
   }
   await saveOrder(order);
   res.status(201).json({ ok: true });
+});
+
+// Public, aggregated-only — mirrors netlify/functions/bestsellers.mjs for local dev.
+app.get("/api/bestsellers", async (req, res) => {
+  res.json(aggregateSalesByProduct(await getAllOrders()));
 });
 
 // Only the public/ folder is ever served over HTTP — server.js, package.json,

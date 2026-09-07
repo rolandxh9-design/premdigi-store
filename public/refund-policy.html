@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refund Policy - PremDigi</title>
+<meta name="description" content="PremDigi's Refund Policy for digital product purchases.">
+<link rel="canonical" href="https://premdigi-store.netlify.app/refund-policy.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    const saved = localStorage.getItem("premdigi-theme");
+    const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+  .legal-content { max-width: 720px; margin: 0 auto; }
+  .legal-content h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .legal-content .updated { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  .legal-content h2 { font-size: 1.1rem; margin: 2rem 0 0.75rem; }
+  .legal-content p, .legal-content li { color: var(--muted); line-height: 1.7; font-size: 0.95rem; }
+  .legal-content ul { padding-left: 1.25rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi</a>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+      <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
+        <span id="cart-icon"></span>
+        <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <a href="index.html" class="back-link">&larr; Back to store</a>
+  <div class="legal-content">
+    <h1>Refund Policy</h1>
+    <p class="updated">Last updated: September 2026</p>
+
+    <p>This policy explains how refunds work for purchases made on PremDigi.</p>
+
+    <h2>All Digital Sales Are Final</h2>
+    <p>Because every product PremDigi sells is delivered electronically, all sales are final once your product has been delivered. We're unable to offer refunds simply due to a change of mind after delivery.</p>
+
+    <h2>Before You Buy</h2>
+    <p>Please review each product's description, category, and price carefully on its product page before completing your purchase, since this information is what we use to confirm what you're buying.</p>
+
+    <h2>If Something Goes Wrong</h2>
+    <p>If you paid but never received your product, or received the wrong product, let us know and we'll work to resolve it directly. Refund decisions in these cases are handled on a case-by-case basis.</p>
+
+    <h2>Payment Disputes</h2>
+    <p>Since checkout is processed through PayPal, PayPal's own buyer protection policies may also apply to your purchase. Refer to PayPal's terms for details on how disputes through PayPal are handled.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy - PremDigi</title>
+<meta name="description" content="PremDigi's Privacy Policy — what information we collect and how it's used.">
+<link rel="canonical" href="https://premdigi-store.netlify.app/privacy.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    const saved = localStorage.getItem("premdigi-theme");
+    const theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+  .legal-content { max-width: 720px; margin: 0 auto; }
+  .legal-content h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .legal-content .updated { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  .legal-content h2 { font-size: 1.1rem; margin: 2rem 0 0.75rem; }
+  .legal-content p, .legal-content li { color: var(--muted); line-height: 1.7; font-size: 0.95rem; }
+  .legal-content ul { padding-left: 1.25rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi</a>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+      <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
+        <span id="cart-icon"></span>
+        <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <a href="index.html" class="back-link">&larr; Back to store</a>
+  <div class="legal-content">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: September 2026</p>
+
+    <p>This Privacy Policy explains what information PremDigi collects when you use this site, and how it's used.</p>
+
+    <h2>1. Information We Collect</h2>
+    <p>When you complete a purchase, PayPal shares certain order details with us so we can fulfill it — typically your name, email address, and the items and amount purchased. We do not receive or store your card number or other payment credentials; those are handled entirely by PayPal.</p>
+
+    <h2>2. Cart and Preferences</h2>
+    <p>Your shopping cart and theme preference (light/dark mode) are stored locally in your browser (via <code>localStorage</code>). This information stays on your device and is not sent to us.</p>
+
+    <h2>3. How We Use Order Information</h2>
+    <p>We use the order details we receive to deliver your digital product and to keep a record of the sale. We do not sell or share your information with third parties for marketing purposes.</p>
+
+    <h2>4. Payment Processing</h2>
+    <p>All payments are processed by PayPal, which has its own privacy policy governing how it handles your payment information. We encourage you to review PayPal's privacy policy as well.</p>
+
+    <h2>5. Data Retention</h2>
+    <p>We keep order records for as long as needed to manage the store and resolve any issues with a purchase.</p>
+
+    <h2>6. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Continued use of the site after changes are posted means you accept the updated policy.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/theme.js"></script>
+</body>
+</html>

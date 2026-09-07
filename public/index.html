@@ -3,10 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PremDigi Store</title>
+<title>PremDigi — Digital Trading Resources, Delivered After Purchase</title>
+<meta name="description" content="PremDigi is a digital storefront for trading e-books, courses, and automated trading bots for crypto and forex. Secure checkout with PayPal, priced in USD.">
+<link rel="canonical" href="https://premdigi-store.netlify.app/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PremDigi — Digital Trading Resources">
+<meta property="og:description" content="Trading e-books, courses, and automated trading bots for crypto and forex. Secure checkout with PayPal.">
+<meta property="og:url" content="https://premdigi-store.netlify.app/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script>
   // Set theme before paint to avoid a flash of the wrong theme.
@@ -21,50 +27,208 @@
 
 <header class="site-header">
   <div class="header-inner">
-    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi Store</a>
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi</a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <a href="#top" class="nav-link" data-section="top">Home</a>
+      <a href="#products" class="nav-link" data-section="products">Products</a>
+      <a href="#categories" class="nav-link" data-section="categories">Categories</a>
+      <a href="#faq" class="nav-link" data-section="faq">Support</a>
+    </nav>
+
     <div class="header-actions">
+      <button id="search-toggle" class="icon-btn" aria-label="Search products" aria-expanded="false" title="Search">
+        <span id="search-icon" aria-hidden="true"></span>
+      </button>
       <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <span id="theme-icon"></span>
+        <span id="theme-icon" aria-hidden="true"></span>
       </button>
       <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
-        <span id="cart-icon"></span>
+        <span id="cart-icon" aria-hidden="true"></span>
         <span id="cart-count" class="cart-badge">0</span>
       </a>
+      <button id="mobile-nav-toggle" class="icon-btn mobile-nav-toggle" aria-label="Open menu" aria-expanded="false" title="Menu">
+        <span id="mobile-menu-icon" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
+
+  <div class="header-search-panel" id="search-panel" hidden>
+    <div class="header-search-inner">
+      <input type="search" id="site-search-input" placeholder="Search products by name or category..." aria-label="Search products" autocomplete="off">
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" hidden aria-label="Mobile">
+    <a href="#top">Home</a>
+    <a href="#products">Products</a>
+    <a href="#categories">Categories</a>
+    <a href="#faq">Support</a>
+  </nav>
 </header>
 
-<section class="hero">
-  <div class="hero-inner">
-    <h1>Digital Trading Resources</h1>
-    <p>Instant downloads. Secure checkout with PayPal, priced in USD.</p>
-  </div>
-</section>
+<main id="top">
 
-<main>
-  <h2>All Products</h2>
-  <div class="product-grid" id="product-grid"></div>
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <span class="hero-eyebrow">Crypto &amp; Forex Trading Resources</span>
+        <h1>Trading knowledge and tools, delivered directly to you.</h1>
+        <p>PremDigi is a focused digital storefront for trading e-books, courses, and automated bots — built for traders who want structured resources without the noise. Checkout securely with PayPal.</p>
+        <div class="hero-ctas">
+          <a href="#products" class="btn btn-primary">Explore Products</a>
+          <a href="#categories" class="btn btn-secondary">Browse Categories</a>
+        </div>
+      </div>
+      <div class="hero-visual" id="hero-visual" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section class="trust-strip">
+    <div class="trust-strip-inner">
+      <div class="trust-item"><span class="trust-icon" id="trust-icon-0" aria-hidden="true"></span><span>Secure Checkout via PayPal</span></div>
+      <div class="trust-item"><span class="trust-icon" id="trust-icon-1" aria-hidden="true"></span><span>Straightforward Purchase Process</span></div>
+      <div class="trust-item"><span class="trust-icon" id="trust-icon-2" aria-hidden="true"></span><span>Digital Products, Delivered After Purchase</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="categories">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-eyebrow">Browse by Category</span>
+        <h2 class="section-title">Find what you're looking for</h2>
+        <p class="section-subtitle">Every PremDigi product falls into one of these categories.</p>
+      </div>
+      <div class="category-grid" id="category-grid"></div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="products">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-eyebrow">Full Catalog</span>
+        <h2 class="section-title">All Products</h2>
+        <p class="section-subtitle">Every digital product currently available at PremDigi.</p>
+      </div>
+      <div class="active-filter-bar" id="active-filter-bar" hidden></div>
+      <div class="product-grid" id="product-grid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="bestsellers-section" hidden>
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-eyebrow">Popular Right Now</span>
+        <h2 class="section-title">Best Sellers</h2>
+        <p class="section-subtitle">The products PremDigi customers choose most.</p>
+      </div>
+      <div class="product-grid" id="bestsellers-grid"></div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-eyebrow">Why PremDigi</span>
+        <h2 class="section-title">Built for a straightforward buying experience</h2>
+      </div>
+      <div class="why-grid" id="why-grid"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-eyebrow">How It Works</span>
+        <h2 class="section-title">Three simple steps</h2>
+      </div>
+      <div class="steps-grid" id="steps-grid"></div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="faq">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-eyebrow">Support</span>
+        <h2 class="section-title">Frequently asked questions</h2>
+      </div>
+      <div class="faq-list" id="faq-list"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inner">
+      <div class="final-cta">
+        <h2>Find your next trading resource</h2>
+        <p>Explore the PremDigi catalog and get started today.</p>
+        <a href="#products" class="btn btn-primary">Shop Now</a>
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<footer class="site-footer">
-  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
-  <p class="risk-disclaimer">Trading involves risk. These products are educational and/or software tools and do not guarantee profits. Past performance, if shown, does not guarantee future results. Only trade with money you can afford to lose.</p>
+<footer class="site-footer" style="padding:0;">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi</a>
+      <p>Digital trading resources — e-books, courses, and automated bots for crypto and forex, with secure PayPal checkout.</p>
+    </div>
+    <div class="footer-col">
+      <h3>Shop</h3>
+      <ul>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#categories">Categories</a></li>
+        <li><a href="#bestsellers-section" id="footer-bestsellers-link" hidden>Best Sellers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Support</h3>
+      <ul>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="cart.html">Your Cart</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="refund-policy.html">Refund Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p style="margin:0 0 0.5rem;">&copy; 2026 PremDigi Store. All digital sales are final.</p>
+    <p class="risk-disclaimer">Trading involves risk. These products are educational and/or software tools and do not guarantee profits. Past performance, if shown, does not guarantee future results. Only trade with money you can afford to lose.</p>
+  </div>
 </footer>
 
+<script src="js/config.js"></script>
 <script src="js/products.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/theme.js"></script>
 <script>
-  const grid = document.getElementById("product-grid");
+  // ---------------- Icons ----------------
+  document.getElementById("search-icon").innerHTML = ICONS.search;
+  document.getElementById("mobile-menu-icon").innerHTML = ICONS.menu;
+  document.getElementById("trust-icon-0").innerHTML = ICONS.shield;
+  document.getElementById("trust-icon-1").innerHTML = ICONS.check;
+  document.getElementById("trust-icon-2").innerHTML = ICONS.package;
 
-  PRODUCTS.forEach(product => {
+  // ---------------- Product grid (existing behavior, preserved) ----------------
+  const grid = document.getElementById("product-grid");
+  let activeCategory = null;
+
+  function renderProductCard(product, options = {}) {
     const card = document.createElement("div");
     card.className = `product-card cat-${product.category}`;
-
     card.innerHTML = `
+      ${options.ribbon ? `<span class="ribbon">${options.ribbon}</span>` : ""}
       <a class="card-link" href="product.html?id=${encodeURIComponent(product.id)}">
-        <div class="product-icon cat-${product.category}">${ICONS[product.icon] || ""}</div>
+        <div class="product-icon cat-${product.category}" aria-hidden="true">${ICONS[product.icon] || ""}</div>
         <span class="product-badge cat-${product.category}">${CATEGORY_LABELS[product.category] || "Digital Download"}</span>
         <div class="product-name">${product.name}</div>
         ${product.tagline ? `<div class="product-tagline">${product.tagline}</div>` : ""}
@@ -72,18 +236,328 @@
       </a>
       <button class="btn btn-secondary btn-block add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
     `;
+    return card;
+  }
 
-    grid.appendChild(card);
-  });
+  function renderProducts() {
+    grid.innerHTML = "";
+    const list = activeCategory ? PRODUCTS.filter(p => p.category === activeCategory) : PRODUCTS;
+    list.forEach(product => grid.appendChild(renderProductCard(product)));
+    wireAddToCartButtons();
+  }
 
-  document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+  function wireAddToCartButtons() {
+    // :not([data-wired]) guard — this runs again after Best Sellers loads
+    // (which can repeat a product also shown in the main grid), so without
+    // it a shared button would accumulate duplicate click listeners.
+    document.querySelectorAll(".add-to-cart-btn:not([data-wired])").forEach(btn => {
+      btn.dataset.wired = "1";
+      btn.addEventListener("click", () => {
+        addToCart(btn.dataset.id, 1);
+        const original = btn.textContent;
+        btn.textContent = "Added ✓";
+        setTimeout(() => { btn.textContent = original; }, 1200);
+      });
+    });
+  }
+
+  renderProducts();
+
+  // ---------------- Categories (real counts from PRODUCTS) ----------------
+  const CATEGORY_ICONS = { ebook: "book", course: "graduation-cap", bot: "bot" };
+  const CATEGORY_DESCRIPTIONS = {
+    ebook: "Focused digital guides for reading charts and spotting patterns.",
+    course: "Structured video-style courses for building trading knowledge.",
+    bot: "Automated tools for executing a defined trading strategy."
+  };
+
+  function renderCategories() {
+    const container = document.getElementById("category-grid");
+    const categories = [...new Set(PRODUCTS.map(p => p.category))];
+    container.innerHTML = categories.map(cat => {
+      const count = PRODUCTS.filter(p => p.category === cat).length;
+      return `
+        <button class="category-card cat-${cat}" data-category="${cat}" type="button">
+          <div class="category-icon cat-${cat}">${ICONS[CATEGORY_ICONS[cat]] || ""}</div>
+          <div class="category-name">${CATEGORY_LABELS[cat] || cat}</div>
+          <div class="category-desc">${CATEGORY_DESCRIPTIONS[cat] || ""}</div>
+          <div class="category-count">${count} product${count === 1 ? "" : "s"}</div>
+        </button>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".category-card").forEach(card => {
+      card.addEventListener("click", () => setActiveCategory(card.dataset.category));
+    });
+  }
+
+  function setActiveCategory(cat) {
+    activeCategory = activeCategory === cat ? null : cat;
+    document.querySelectorAll(".category-card").forEach(c => {
+      c.classList.toggle("is-active", c.dataset.category === activeCategory);
+    });
+    renderProducts();
+    renderFilterBar();
+    document.getElementById("products").scrollIntoView({ behavior: "smooth" });
+  }
+
+  function renderFilterBar() {
+    const bar = document.getElementById("active-filter-bar");
+    if (!activeCategory) {
+      bar.hidden = true;
+      bar.innerHTML = "";
+      return;
+    }
+    bar.hidden = false;
+    bar.innerHTML = `
+      <div class="filter-chip">
+        Showing: ${CATEGORY_LABELS[activeCategory] || activeCategory}
+        <button type="button" id="clear-filter-btn" aria-label="Clear filter">&times;</button>
+      </div>
+    `;
+    document.getElementById("clear-filter-btn").addEventListener("click", () => setActiveCategory(activeCategory));
+  }
+
+  renderCategories();
+
+  // ---------------- Hero visual (real, honest stats) ----------------
+  document.getElementById("hero-visual").innerHTML = `
+    <div class="hero-visual-card">
+      <div class="hero-visual-icon">${ICONS.box}</div>
+      <strong>${PRODUCTS.length} Products</strong>
+      <span>Across e-books, courses &amp; bots</span>
+    </div>
+    <div class="hero-visual-card">
+      <div class="hero-visual-icon">${ICONS.shield}</div>
+      <strong>PayPal Checkout</strong>
+      <span>Secure, familiar payment</span>
+    </div>
+    <div class="hero-visual-card">
+      <div class="hero-visual-icon">${ICONS.tag}</div>
+      <strong>USD Pricing</strong>
+      <span>Clear, upfront pricing</span>
+    </div>
+    <div class="hero-visual-card">
+      <div class="hero-visual-icon">${ICONS["trending-up"]}</div>
+      <strong>Crypto &amp; Forex</strong>
+      <span>Focused on trading resources</span>
+    </div>
+  `;
+
+  // ---------------- Best sellers (only rendered if real sales data exists) ----------------
+  (async function loadBestSellers() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/bestsellers`);
+      if (!res.ok) return;
+      const sales = await res.json();
+      if (!Array.isArray(sales) || sales.length === 0) return;
+
+      const top = sales
+        .map(s => ({ ...s, product: PRODUCTS.find(p => p.id === s.productId) }))
+        .filter(s => s.product)
+        .slice(0, 3);
+
+      if (top.length === 0) return;
+
+      const section = document.getElementById("bestsellers-section");
+      const bsGrid = document.getElementById("bestsellers-grid");
+      bsGrid.innerHTML = "";
+      top.forEach(s => bsGrid.appendChild(renderProductCard(s.product, { ribbon: "Best Seller" })));
+      wireAddToCartButtons();
+      section.hidden = false;
+      document.getElementById("footer-bestsellers-link").hidden = false;
+    } catch (e) {
+      // Public storefront — fail silently if the endpoint is unreachable.
+    }
+  })();
+
+  // ---------------- Why PremDigi ----------------
+  document.getElementById("why-grid").innerHTML = `
+    <div class="why-item">
+      <div class="why-icon">${ICONS.shield}</div>
+      <h3>Secure Checkout</h3>
+      <p>Every purchase is processed through PayPal — PremDigi never sees or stores your card details.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">${ICONS.box}</div>
+      <h3>Focused Product Range</h3>
+      <p>A deliberately curated set of trading e-books, courses, and bots — not an endless, generic catalog.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">${ICONS.check}</div>
+      <h3>Straightforward Process</h3>
+      <p>Browse, add to cart, and check out in a few clicks — no account required to purchase.</p>
+    </div>
+    <div class="why-item">
+      <div class="why-icon">${ICONS.package}</div>
+      <h3>Clear Pricing</h3>
+      <p>Every product is listed with a single, upfront USD price — no hidden fees at checkout.</p>
+    </div>
+  `;
+
+  // ---------------- How it works ----------------
+  document.getElementById("steps-grid").innerHTML = `
+    <div class="step-item">
+      <span class="step-number">01</span>
+      <h3>Choose Your Product</h3>
+      <p>Browse categories or search to find the trading e-book, course, or bot that fits what you need.</p>
+    </div>
+    <div class="step-item">
+      <span class="step-number">02</span>
+      <h3>Check Out Securely</h3>
+      <p>Add to cart and complete your purchase through PayPal's secure checkout.</p>
+    </div>
+    <div class="step-item">
+      <span class="step-number">03</span>
+      <h3>Receive Your Product</h3>
+      <p>Once your payment is confirmed, your product is delivered directly to you.</p>
+    </div>
+  `;
+
+  // ---------------- FAQ ----------------
+  const FAQS = [
+    {
+      q: "What payment methods do you accept?",
+      a: "PremDigi accepts payments securely through PayPal, including PayPal balance, linked bank accounts, and debit/credit cards via PayPal's checkout."
+    },
+    {
+      q: "How do I receive my digital product after purchase?",
+      a: "Once your PayPal payment is confirmed, your product is delivered directly to you. If you don't receive it promptly, reach out and we'll sort it out."
+    },
+    {
+      q: "Can I get a refund?",
+      a: "All digital sales are final, since products are delivered electronically. See our Refund Policy for full details."
+    },
+    {
+      q: "Is checkout secure?",
+      a: "Yes. All payments are processed through PayPal's secure checkout — PremDigi never sees or stores your card or payment details."
+    },
+    {
+      q: "What currency are prices listed in?",
+      a: "All PremDigi prices are listed in US Dollars (USD)."
+    }
+  ];
+
+  document.getElementById("faq-list").innerHTML = FAQS.map((item, i) => `
+    <div class="faq-item" id="faq-item-${i}">
+      <button class="faq-question" type="button" aria-expanded="false" aria-controls="faq-answer-${i}">
+        ${item.q}
+        <span aria-hidden="true">${ICONS["chevron-down"]}</span>
+      </button>
+      <div class="faq-answer" id="faq-answer-${i}">
+        <p>${item.a}</p>
+      </div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll(".faq-question").forEach(btn => {
     btn.addEventListener("click", () => {
-      addToCart(btn.dataset.id, 1);
-      const original = btn.textContent;
-      btn.textContent = "Added ✓";
-      setTimeout(() => { btn.textContent = original; }, 1200);
+      const item = btn.closest(".faq-item");
+      const answer = item.querySelector(".faq-answer");
+      const isOpen = item.classList.toggle("open");
+      btn.setAttribute("aria-expanded", String(isOpen));
+      answer.style.maxHeight = isOpen ? answer.scrollHeight + "px" : "0px";
     });
   });
+
+  // ---------------- Header search (real, client-side, no fake results) ----------------
+  const searchToggle = document.getElementById("search-toggle");
+  const searchPanel = document.getElementById("search-panel");
+  const searchInput = document.getElementById("site-search-input");
+  const searchResults = document.getElementById("search-results");
+
+  searchToggle.addEventListener("click", () => {
+    const isHidden = searchPanel.hidden;
+    searchPanel.hidden = !isHidden;
+    searchToggle.setAttribute("aria-expanded", String(isHidden));
+    if (isHidden) searchInput.focus();
+  });
+
+  searchInput.addEventListener("input", () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) {
+      searchResults.hidden = true;
+      searchResults.innerHTML = "";
+      return;
+    }
+    const matches = PRODUCTS.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (CATEGORY_LABELS[p.category] || "").toLowerCase().includes(q) ||
+      (p.tagline || "").toLowerCase().includes(q)
+    ).slice(0, 6);
+
+    searchResults.hidden = false;
+    if (matches.length === 0) {
+      searchResults.innerHTML = `<div class="search-empty">No products found.</div>`;
+      return;
+    }
+    searchResults.innerHTML = matches.map(p => `
+      <a class="search-result-item" href="product.html?id=${encodeURIComponent(p.id)}">
+        <span class="search-result-icon cat-${p.category}">${ICONS[p.icon] || ""}</span>
+        <span class="search-result-name">${p.name}</span>
+        <span class="search-result-price">$${p.price.toFixed(2)}</span>
+      </a>
+    `).join("");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!searchPanel.contains(e.target) && e.target !== searchToggle && !searchToggle.contains(e.target)) {
+      searchPanel.hidden = true;
+    }
+  });
+
+  // ---------------- Mobile nav ----------------
+  const mobileNavToggle = document.getElementById("mobile-nav-toggle");
+  const mobileNav = document.getElementById("mobile-nav");
+  mobileNavToggle.addEventListener("click", () => {
+    const isHidden = mobileNav.hidden;
+    mobileNav.hidden = !isHidden;
+    mobileNavToggle.setAttribute("aria-expanded", String(isHidden));
+  });
+  mobileNav.querySelectorAll("a").forEach(a => {
+    a.addEventListener("click", () => { mobileNav.hidden = true; });
+  });
+
+  // ---------------- Scrollspy: highlight active nav link ----------------
+  const navLinks = document.querySelectorAll(".nav-link[data-section]");
+  const sections = ["top", "products", "categories", "faq"].map(id => document.getElementById(id)).filter(Boolean);
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => link.classList.toggle("active", link.dataset.section === entry.target.id));
+        }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    sections.forEach(s => observer.observe(s));
+  }
+
+  // ---------------- Structured data (real product info only) ----------------
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": PRODUCTS.map((p, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "item": {
+        "@type": "Product",
+        "name": p.name,
+        "description": p.description,
+        "category": CATEGORY_LABELS[p.category] || p.category,
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "USD",
+          "price": p.price.toFixed(2),
+          "url": `https://premdigi-store.netlify.app/product.html?id=${encodeURIComponent(p.id)}`
+        }
+      }
+    }))
+  };
+  const ldScript = document.createElement("script");
+  ldScript.type = "application/ld+json";
+  ldScript.textContent = JSON.stringify(structuredData);
+  document.head.appendChild(ldScript);
 </script>
 
 </body>

@@ -100,5 +100,36 @@ const ICONS = {
   settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="3"/>
     <path d="M19.4 13a8.06 8.06 0 000-2l2-1.5-2-3.46-2.37 1a7.9 7.9 0 00-1.73-1L15 3H9l-.3 2.6a7.9 7.9 0 00-1.73 1l-2.37-1-2 3.46 2 1.5a8.06 8.06 0 000 2l-2 1.5 2 3.46 2.37-1c.53.43 1.11.77 1.73 1L9 21h6l.3-2.6a7.9 7.9 0 001.73-1l2.37 1 2-3.46-2-1.5z"/>
+  </svg>`,
+
+  // Homepage sections (trust indicators, search, FAQ)
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10.5" cy="10.5" r="6.5"/>
+    <path d="M20 20l-4.6-4.6"/>
+  </svg>`,
+
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l7 3v5.5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/>
+    <path d="M9 12l2 2 4-4"/>
+  </svg>`,
+
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12.5l5 5L20 6.5"/>
+  </svg>`,
+
+  "chevron-down": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 9l6 6 6-6"/>
+  </svg>`,
+
+  package: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5v-9z"/>
+    <path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/>
+  </svg>`,
+
+  headset: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 13v-1a8 8 0 0116 0v1"/>
+    <rect x="3" y="13" width="4" height="6" rx="1.5"/>
+    <rect x="17" y="13" width="4" height="6" rx="1.5"/>
+    <path d="M20 19.5c0 1.4-1.6 2.5-4 2.5"/>
   </svg>`
 };
