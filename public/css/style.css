@@ -8,6 +8,11 @@
   --accent-hover: #4338ca;
   --accent-soft: #eeedfd;
   --danger: #e5484d;
+  --danger-soft: #fbe3e3;
+  --success: #17875a;
+  --success-soft: #dcf3e8;
+  --warning: #b45309;
+  --warning-soft: #fbecd4;
   --shadow: rgba(20, 20, 30, 0.06);
   --shadow-strong: rgba(20, 20, 30, 0.12);
 
@@ -30,6 +35,11 @@
   --accent-hover: #7d75ff;
   --accent-soft: #232041;
   --danger: #f2717a;
+  --danger-soft: #3a1f22;
+  --success: #3ecf8e;
+  --success-soft: #123329;
+  --warning: #f0b166;
+  --warning-soft: #3a2c14;
   --shadow: rgba(0, 0, 0, 0.35);
   --shadow-strong: rgba(0, 0, 0, 0.5);
 

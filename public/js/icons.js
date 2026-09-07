@@ -60,5 +60,45 @@ const ICONS = {
 
   moon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M20.8 13.8A8.6 8.6 0 1110.2 3.2a7 7 0 0010.6 10.6z"/>
+  </svg>`,
+
+  // Admin sidebar icons
+  dashboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="3" width="8" height="8" rx="1.5"/>
+    <rect x="13" y="3" width="8" height="5" rx="1.5"/>
+    <rect x="13" y="10" width="8" height="11" rx="1.5"/>
+    <rect x="3" y="13" width="8" height="8" rx="1.5"/>
+  </svg>`,
+
+  receipt: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 3h12v18l-2.5-1.5L13 21l-1-1.5L11 21l-2.5-1.5L6 21V3z"/>
+    <path d="M9 8h6M9 12h6M9 16h4"/>
+  </svg>`,
+
+  box: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.5 7.5 12 3l8.5 4.5L12 12z"/>
+    <path d="M3.5 7.5V16l8.5 4.5V12"/>
+    <path d="M20.5 7.5V16L12 20.5"/>
+  </svg>`,
+
+  menu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>`,
+
+  users: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="8" r="3.2"/>
+    <path d="M2.8 19c.6-3.2 3.2-5 6.2-5s5.6 1.8 6.2 5"/>
+    <circle cx="17" cy="8.5" r="2.4"/>
+    <path d="M15.5 14c2.4.2 4.4 1.8 4.9 4.5"/>
+  </svg>`,
+
+  tag: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.5 3.5H6a2.5 2.5 0 00-2.5 2.5v6.5L13 22l9-9-9.5-9.5z"/>
+    <circle cx="8.2" cy="8.2" r="1.4" fill="currentColor" stroke="none"/>
+  </svg>`,
+
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 13a8.06 8.06 0 000-2l2-1.5-2-3.46-2.37 1a7.9 7.9 0 00-1.73-1L15 3H9l-.3 2.6a7.9 7.9 0 00-1.73 1l-2.37-1-2 3.46 2 1.5a8.06 8.06 0 000 2l-2 1.5 2 3.46 2.37-1c.53.43 1.11.77 1.73 1L9 21h6l.3-2.6a7.9 7.9 0 001.73-1l2.37 1 2-3.46-2-1.5z"/>
   </svg>`
 };

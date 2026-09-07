@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.min.js"></script>
 <script>
   (function () {
     const saved = localStorage.getItem("premdigi-theme");
@@ -18,45 +20,201 @@
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi Admin</a>
-    <div class="header-actions">
-      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <span id="theme-icon"></span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<main>
-  <a href="index.html" class="back-link">&larr; Back to store</a>
-  <h2>Orders</h2>
-
-  <div id="admin-login" class="login-card">
-    <p>Enter the admin credentials to view orders.</p>
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="admin-login" class="admin-login-screen">
+  <div class="admin-login-card">
+    <div class="admin-login-logo"><span class="logo-mark">&#9670;</span> PremDigi Admin</div>
+    <h1>Sign in</h1>
+    <p>Enter your admin credentials to manage the store.</p>
     <form id="login-form">
-      <input type="text" id="login-user" placeholder="Username" autocomplete="username" required>
-      <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
-      <button type="submit" class="btn btn-primary btn-block">View Orders</button>
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        <input type="text" id="login-user" placeholder="Username" autocomplete="username" required>
+        <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
+        <button type="submit" class="btn btn-primary btn-block" id="login-submit">Sign in</button>
+      </div>
     </form>
     <p id="login-error" class="status-message error" hidden></p>
   </div>
+</div>
 
-  <div id="admin-summary" class="admin-summary" hidden></div>
-  <div id="orders-content" hidden></div>
-</main>
+<!-- ============ ADMIN APP SHELL ============ -->
+<div id="admin-app" class="admin-app" hidden>
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <aside id="admin-sidebar" class="admin-sidebar">
+    <div class="admin-sidebar-header"><span class="logo-mark">&#9670;</span> PremDigi Admin</div>
+    <nav class="admin-nav">
+      <div class="admin-nav-section">
+        <div class="admin-nav-label">Overview</div>
+        <button class="admin-nav-item active" data-view="dashboard">
+          <span class="nav-icon"></span> Dashboard
+        </button>
+      </div>
+      <div class="admin-nav-section">
+        <div class="admin-nav-label">Store</div>
+        <button class="admin-nav-item" data-view="orders">
+          <span class="nav-icon"></span> Orders
+        </button>
+        <button class="admin-nav-item" data-view="products">
+          <span class="nav-icon"></span> Products
+        </button>
+        <button class="admin-nav-item disabled" disabled title="Needs a customers backend">
+          <span class="nav-icon"></span> Customers <span class="nav-soon">Soon</span>
+        </button>
+      </div>
+      <div class="admin-nav-section">
+        <div class="admin-nav-label">Marketing</div>
+        <button class="admin-nav-item disabled" disabled title="Needs a coupons backend">
+          <span class="nav-icon"></span> Coupons <span class="nav-soon">Soon</span>
+        </button>
+      </div>
+      <div class="admin-nav-section">
+        <div class="admin-nav-label">Configuration</div>
+        <button class="admin-nav-item disabled" disabled title="Needs a settings backend">
+          <span class="nav-icon"></span> Settings <span class="nav-soon">Soon</span>
+        </button>
+      </div>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <a href="index.html" class="admin-nav-item">&larr; Back to store</a>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle menu"><span id="menu-icon"></span></button>
+      <h1 id="view-title">Dashboard</h1>
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span id="theme-icon"></span>
+      </button>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- ============ DASHBOARD VIEW ============ -->
+      <section id="view-dashboard" class="admin-view">
+        <div class="stat-grid" id="stat-grid"></div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>Revenue</h2>
+              <div class="range-tabs" id="range-tabs">
+                <button data-range="7d" class="active">7D</button>
+                <button data-range="30d">30D</button>
+                <button data-range="90d">90D</button>
+                <button data-range="12m">12M</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="revenue-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h2>Best-Selling Products</h2></div>
+            <div id="best-sellers" class="best-sellers-list"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Orders</h2>
+          </div>
+          <div class="data-table-wrapper" style="border:none;">
+            <table class="data-table" id="recent-orders-table">
+              <thead>
+                <tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ORDERS VIEW ============ -->
+      <section id="view-orders" class="admin-view" hidden>
+        <div class="admin-toolbar">
+          <input type="search" id="orders-search" placeholder="Search by customer, email, or order ID...">
+          <select id="orders-date-filter">
+            <option value="all">All time</option>
+            <option value="today">Today</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+          </select>
+          <select id="orders-sort">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="highest">Highest total</option>
+            <option value="lowest">Lowest total</option>
+          </select>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table" id="orders-table">
+            <thead>
+              <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ PRODUCTS VIEW ============ -->
+      <section id="view-products" class="admin-view" hidden>
+        <div class="admin-toolbar">
+          <input type="search" id="products-search" placeholder="Search products...">
+          <select id="products-category-filter">
+            <option value="all">All categories</option>
+            <option value="ebook">E-Book</option>
+            <option value="course">Course</option>
+            <option value="bot">Trading Bot</option>
+          </select>
+          <select id="products-sort">
+            <option value="revenue">Sort by revenue</option>
+            <option value="units">Sort by units sold</option>
+            <option value="price-high">Price: high to low</option>
+            <option value="price-low">Price: low to high</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table" id="products-table">
+            <thead>
+              <tr><th></th><th>Product</th><th>Category</th><th>Price</th><th>Units Sold</th><th>Revenue</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="backend-note">Products are currently managed in code (<code>public/js/products.js</code>) and redeployed via Git. Ask for a Products management backend (add/edit/delete, image and file upload) to make this editable from here.</p>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ ORDER DETAIL MODAL ============ -->
+<div id="order-modal" class="modal-backdrop" hidden>
+  <div class="modal-panel">
+    <div class="modal-header">
+      <h2>Order details</h2>
+      <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
 
 <script src="js/config.js"></script>
+<script src="js/products.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/theme.js"></script>
 <script>
+  // ---------------- Auth (unchanged behavior from the previous admin panel) ----------------
   const AUTH_KEY = "premdigi-admin-auth";
+  let ORDERS = [];
+  let currentRange = "7d";
+  let revenueChart = null;
 
-  function getStoredAuth() {
-    return sessionStorage.getItem(AUTH_KEY);
-  }
-
+  function getStoredAuth() { return sessionStorage.getItem(AUTH_KEY); }
   function setStoredAuth(value) {
     if (value) sessionStorage.setItem(AUTH_KEY, value);
     else sessionStorage.removeItem(AUTH_KEY);
@@ -76,76 +234,33 @@
 
   function showLogin(errorMessage) {
     document.getElementById("admin-login").hidden = false;
-    document.getElementById("admin-summary").hidden = true;
-    document.getElementById("orders-content").hidden = true;
+    document.getElementById("admin-app").hidden = true;
     const err = document.getElementById("login-error");
-    if (errorMessage) {
-      err.textContent = errorMessage;
-      err.hidden = false;
-    } else {
-      err.hidden = true;
-    }
+    if (errorMessage) { err.textContent = errorMessage; err.hidden = false; }
+    else { err.hidden = true; }
   }
 
-  function showOrders() {
+  function showApp() {
     document.getElementById("admin-login").hidden = true;
-    document.getElementById("admin-summary").hidden = false;
-    document.getElementById("orders-content").hidden = false;
-  }
-
-  function renderOrders(orders) {
-    const summary = document.getElementById("admin-summary");
-    const container = document.getElementById("orders-content");
-
-    if (orders.length === 0) {
-      summary.innerHTML = "";
-      container.innerHTML = `<div class="empty-cart">No orders yet.</div>`;
-      return;
-    }
-
-    const revenue = orders.reduce((sum, o) => sum + o.total, 0);
-    summary.innerHTML = `
-      <div class="summary-card"><span>Total Orders</span><strong>${orders.length}</strong></div>
-      <div class="summary-card"><span>Total Revenue</span><strong>$${revenue.toFixed(2)}</strong></div>
-    `;
-
-    container.innerHTML = `
-      <div class="orders-table-wrapper">
-        <div class="orders-table">
-          <div class="orders-row orders-head">
-            <div>Date</div>
-            <div>Customer</div>
-            <div>Items</div>
-            <div>Order ID</div>
-            <div>Total</div>
-          </div>
-          ${orders.map(o => `
-            <div class="orders-row">
-              <div>${new Date(o.createdAt).toLocaleString()}</div>
-              <div>
-                <div class="orders-customer-name">${o.payerName || "—"}</div>
-                <div class="orders-customer-email">${o.payerEmail || ""}</div>
-              </div>
-              <div>${o.items.map(i => `${i.name} &times;${i.qty}`).join("<br>")}</div>
-              <div class="orders-id">${o.id}</div>
-              <div class="orders-total">$${o.total.toFixed(2)}</div>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-    `;
+    document.getElementById("admin-app").hidden = false;
   }
 
   async function tryLoad(authHeader) {
+    let orders;
     try {
-      const orders = await fetchOrders(authHeader);
-      setStoredAuth(authHeader);
-      showOrders();
-      renderOrders(orders);
-      return null;
+      orders = await fetchOrders(authHeader);
     } catch (e) {
       return e.message;
     }
+    setStoredAuth(authHeader);
+    ORDERS = orders;
+    showApp();
+    try {
+      renderAll();
+    } catch (e) {
+      console.error("Dashboard render error:", e);
+    }
+    return null;
   }
 
   document.getElementById("login-form").addEventListener("submit", async (e) => {
@@ -153,27 +268,410 @@
     const user = document.getElementById("login-user").value;
     const pass = document.getElementById("login-pass").value;
     const header = "Basic " + btoa(`${user}:${pass}`);
+    const btn = document.getElementById("login-submit");
+    btn.disabled = true;
+    btn.textContent = "Signing in...";
 
     const reason = await tryLoad(header);
+    btn.disabled = false;
+    btn.textContent = "Sign in";
     if (reason === "unauthorized") showLogin("Invalid username or password.");
-    else if (reason === "network") showLogin("Could not reach the server. Make sure node server.js is running.");
+    else if (reason === "network") showLogin("Could not reach the server. Make sure it's running.");
     else if (reason) showLogin("Something went wrong. Please try again.");
   });
 
   (async function init() {
     const stored = getStoredAuth();
-    if (!stored) {
-      showLogin();
+    if (!stored) { showLogin(); return; }
+    const reason = await tryLoad(stored);
+    if (reason === "unauthorized") { setStoredAuth(null); showLogin(); }
+    else if (reason) { showLogin(); }
+  })();
+
+  // ---------------- Sidebar nav + mobile drawer ----------------
+  const viewTitles = { dashboard: "Dashboard", orders: "Orders", products: "Products" };
+
+  document.querySelectorAll(".admin-nav-item[data-view]").forEach(btn => {
+    btn.addEventListener("click", () => switchView(btn.dataset.view));
+  });
+
+  function switchView(view) {
+    document.querySelectorAll(".admin-view").forEach(el => el.hidden = true);
+    document.getElementById(`view-${view}`).hidden = false;
+    document.querySelectorAll(".admin-nav-item[data-view]").forEach(el => {
+      el.classList.toggle("active", el.dataset.view === view);
+    });
+    document.getElementById("view-title").textContent = viewTitles[view];
+    closeSidebar();
+  }
+
+  const sidebar = document.getElementById("admin-sidebar");
+  const backdrop = document.getElementById("sidebar-backdrop");
+  document.getElementById("sidebar-toggle").addEventListener("click", () => {
+    sidebar.classList.add("open");
+    backdrop.classList.add("open");
+  });
+  function closeSidebar() {
+    sidebar.classList.remove("open");
+    backdrop.classList.remove("open");
+  }
+  backdrop.addEventListener("click", closeSidebar);
+
+  // ---------------- Icons ----------------
+  function paintIcons() {
+    document.querySelector('[data-view="dashboard"] .nav-icon').innerHTML = ICONS.dashboard;
+    document.querySelector('[data-view="orders"] .nav-icon').innerHTML = ICONS.receipt;
+    document.querySelector('[data-view="products"] .nav-icon').innerHTML = ICONS.box;
+    document.querySelectorAll('.admin-nav-item.disabled .nav-icon')[0].innerHTML = ICONS.users;
+    document.querySelectorAll('.admin-nav-item.disabled .nav-icon')[1].innerHTML = ICONS.tag;
+    document.querySelectorAll('.admin-nav-item.disabled .nav-icon')[2].innerHTML = ICONS.settings;
+    document.getElementById("menu-icon").innerHTML = ICONS.menu;
+  }
+  paintIcons();
+
+  // ---------------- Helpers ----------------
+  function fmtMoney(n) {
+    return `$${(n || 0).toFixed(2)}`;
+  }
+  function localDayKey(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function computeMetrics(orders) {
+    const now = new Date();
+    const todayKey = localDayKey(now);
+    const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
+    let totalRevenue = 0, revenueToday = 0, revenueMonth = 0, unitsSold = 0, ordersToday = 0;
+    const customers = new Set();
+
+    orders.forEach(o => {
+      const d = new Date(o.createdAt);
+      totalRevenue += o.total;
+      if (localDayKey(d) === todayKey) { revenueToday += o.total; ordersToday++; }
+      if (`${d.getFullYear()}-${d.getMonth()}` === monthKey) revenueMonth += o.total;
+      if (o.payerEmail) customers.add(o.payerEmail.toLowerCase());
+      (o.items || []).forEach(i => { unitsSold += i.qty; });
+    });
+
+    return {
+      totalRevenue, revenueToday, revenueMonth,
+      totalOrders: orders.length, ordersToday,
+      totalCustomers: customers.size,
+      avgOrderValue: orders.length ? totalRevenue / orders.length : 0,
+      unitsSold
+    };
+  }
+
+  function computeBestSellers(orders) {
+    const map = new Map();
+    orders.forEach(o => {
+      (o.items || []).forEach(i => {
+        const key = i.id || i.name;
+        const entry = map.get(key) || { name: i.name, qty: 0, revenue: 0 };
+        entry.qty += i.qty;
+        entry.revenue += i.qty * i.price;
+        map.set(key, entry);
+      });
+    });
+    return [...map.values()].sort((a, b) => b.revenue - a.revenue);
+  }
+
+  function bucketRevenue(orders, range) {
+    const now = new Date();
+    const keys = [];
+    const buckets = new Map();
+
+    if (range === "12m") {
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        keys.push(key);
+        buckets.set(key, 0);
+      }
+      orders.forEach(o => {
+        const d = new Date(o.createdAt);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        if (buckets.has(key)) buckets.set(key, buckets.get(key) + o.total);
+      });
+      const labels = keys.map(k => {
+        const [y, m] = k.split("-");
+        return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString(undefined, { month: "short" });
+      });
+      return { labels, data: keys.map(k => buckets.get(k)) };
+    }
+
+    const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = localDayKey(d);
+      keys.push(key);
+      buckets.set(key, 0);
+    }
+    orders.forEach(o => {
+      const key = localDayKey(new Date(o.createdAt));
+      if (buckets.has(key)) buckets.set(key, buckets.get(key) + o.total);
+    });
+    const labels = keys.map(k => {
+      const [y, m, day] = k.split("-");
+      return new Date(Number(y), Number(m) - 1, Number(day)).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    });
+    return { labels, data: keys.map(k => buckets.get(k)) };
+  }
+
+  // ---------------- Rendering ----------------
+  function renderAll() {
+    renderDashboard();
+    renderOrdersTable();
+    renderProductsTable();
+  }
+
+  function renderDashboard() {
+    const m = computeMetrics(ORDERS);
+    const statGrid = document.getElementById("stat-grid");
+    statGrid.innerHTML = `
+      <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value">${fmtMoney(m.totalRevenue)}</div></div>
+      <div class="stat-card"><div class="stat-label">Revenue Today</div><div class="stat-value">${fmtMoney(m.revenueToday)}</div></div>
+      <div class="stat-card"><div class="stat-label">Revenue This Month</div><div class="stat-value">${fmtMoney(m.revenueMonth)}</div></div>
+      <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value">${m.totalOrders}</div><div class="stat-sub">${m.ordersToday} today</div></div>
+      <div class="stat-card"><div class="stat-label">Total Customers</div><div class="stat-value">${m.totalCustomers}</div></div>
+      <div class="stat-card"><div class="stat-label">Avg. Order Value</div><div class="stat-value">${fmtMoney(m.avgOrderValue)}</div></div>
+      <div class="stat-card"><div class="stat-label">Products</div><div class="stat-value">${PRODUCTS.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Units Sold</div><div class="stat-value">${m.unitsSold}</div></div>
+    `;
+
+    renderChart(currentRange);
+
+    const bestSellers = computeBestSellers(ORDERS).slice(0, 5);
+    const bestSellersEl = document.getElementById("best-sellers");
+    if (bestSellers.length === 0) {
+      bestSellersEl.innerHTML = `<div class="admin-empty">No sales yet.</div>`;
+    } else {
+      bestSellersEl.innerHTML = bestSellers.map((p, i) => `
+        <div class="best-seller-row">
+          <div class="best-seller-rank">${i + 1}</div>
+          <div class="best-seller-info">
+            <div class="best-seller-name">${escapeHtml(p.name)}</div>
+            <div class="best-seller-meta">${p.qty} sold</div>
+          </div>
+          <div class="best-seller-revenue">${fmtMoney(p.revenue)}</div>
+        </div>
+      `).join("");
+    }
+
+    const recent = [...ORDERS].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+    const recentBody = document.querySelector("#recent-orders-table tbody");
+    if (recent.length === 0) {
+      recentBody.innerHTML = `<tr><td colspan="5" class="admin-empty">No orders yet.</td></tr>`;
+    } else {
+      recentBody.innerHTML = recent.map(o => `
+        <tr onclick="openOrderDetail('${o.id}')">
+          <td data-label="Order" class="cell-primary orders-id">${escapeHtml(o.id)}</td>
+          <td data-label="Customer">${escapeHtml(o.payerName || "—")}</td>
+          <td data-label="Total" class="cell-primary">${fmtMoney(o.total)}</td>
+          <td data-label="Status"><span class="badge badge-success">Paid</span></td>
+          <td data-label="Date" class="cell-muted">${new Date(o.createdAt).toLocaleDateString()}</td>
+        </tr>
+      `).join("");
+    }
+  }
+
+  function renderChart(range) {
+    if (typeof Chart === "undefined") {
+      document.querySelector(".chart-container").innerHTML = `<div class="admin-empty">Chart library failed to load. Check your connection and reload.</div>`;
       return;
     }
-    const reason = await tryLoad(stored);
-    if (reason === "unauthorized") {
-      setStoredAuth(null);
-      showLogin();
-    } else if (reason) {
-      showLogin();
+    const { labels, data } = bucketRevenue(ORDERS, range);
+    const ctx = document.getElementById("revenue-chart").getContext("2d");
+    const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue("--border").trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim();
+
+    if (revenueChart) revenueChart.destroy();
+    revenueChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: accent,
+          backgroundColor: accent + "22",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => fmtMoney(ctx.parsed.y) } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: textColor, maxTicksLimit: 8 } },
+          y: { grid: { color: gridColor }, ticks: { color: textColor, callback: (v) => "$" + v } }
+        }
+      }
+    });
+  }
+
+  document.getElementById("range-tabs").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-range]");
+    if (!btn) return;
+    currentRange = btn.dataset.range;
+    document.querySelectorAll("#range-tabs button").forEach(b => b.classList.toggle("active", b === btn));
+    renderChart(currentRange);
+  });
+
+  // ---------------- Orders view ----------------
+  function getFilteredOrders() {
+    const search = document.getElementById("orders-search").value.trim().toLowerCase();
+    const dateFilter = document.getElementById("orders-date-filter").value;
+    const sort = document.getElementById("orders-sort").value;
+    const now = new Date();
+
+    let list = ORDERS.filter(o => {
+      if (search) {
+        const haystack = `${o.payerName || ""} ${o.payerEmail || ""} ${o.id}`.toLowerCase();
+        if (!haystack.includes(search)) return false;
+      }
+      if (dateFilter !== "all") {
+        const d = new Date(o.createdAt);
+        const diffDays = (now - d) / 86400000;
+        if (dateFilter === "today" && localDayKey(d) !== localDayKey(now)) return false;
+        if (dateFilter === "7d" && diffDays > 7) return false;
+        if (dateFilter === "30d" && diffDays > 30) return false;
+      }
+      return true;
+    });
+
+    list.sort((a, b) => {
+      if (sort === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sort === "highest") return b.total - a.total;
+      if (sort === "lowest") return a.total - b.total;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    return list;
+  }
+
+  function renderOrdersTable() {
+    const body = document.querySelector("#orders-table tbody");
+    const list = getFilteredOrders();
+
+    if (ORDERS.length === 0) {
+      body.innerHTML = `<tr><td colspan="6" class="admin-empty">No orders yet. They'll show up here as customers check out.</td></tr>`;
+      return;
     }
-  })();
+    if (list.length === 0) {
+      body.innerHTML = `<tr><td colspan="6" class="admin-empty">No orders match your search/filters.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = list.map(o => {
+      const itemsLabel = (o.items || []).map(i => `${i.name} &times;${i.qty}`).join(", ");
+      return `
+        <tr onclick="openOrderDetail('${o.id}')">
+          <td data-label="Order ID" class="cell-primary orders-id">${escapeHtml(o.id)}</td>
+          <td data-label="Customer">
+            <div class="cell-primary">${escapeHtml(o.payerName || "—")}</div>
+            <div class="cell-muted">${escapeHtml(o.payerEmail || "")}</div>
+          </td>
+          <td data-label="Items" class="cell-muted">${itemsLabel}</td>
+          <td data-label="Total" class="cell-primary">${fmtMoney(o.total)}</td>
+          <td data-label="Status"><span class="badge badge-success">Paid</span></td>
+          <td data-label="Date" class="cell-muted">${new Date(o.createdAt).toLocaleString()}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  ["orders-search", "orders-date-filter", "orders-sort"].forEach(id => {
+    document.getElementById(id).addEventListener("input", renderOrdersTable);
+  });
+
+  function openOrderDetail(id) {
+    const order = ORDERS.find(o => o.id === id);
+    if (!order) return;
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+      <div class="detail-row"><span class="detail-label">Order ID</span><span class="detail-value">${escapeHtml(order.id)}</span></div>
+      <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${new Date(order.createdAt).toLocaleString()}</span></div>
+      <div class="detail-row"><span class="detail-label">Customer</span><span class="detail-value">${escapeHtml(order.payerName || "—")}</span></div>
+      <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${escapeHtml(order.payerEmail || "—")}</span></div>
+      <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge badge-success">Paid</span></span></div>
+      <div class="detail-items">
+        <div class="detail-label" style="margin-bottom:0.5rem;">Items</div>
+        ${(order.items || []).map(i => `
+          <div class="detail-item-row">
+            <span class="detail-item-name">${escapeHtml(i.name)}</span>
+            <span class="detail-item-qty">&times;${i.qty} — ${fmtMoney(i.price * i.qty)}</span>
+          </div>
+        `).join("")}
+      </div>
+      <div class="detail-row" style="margin-top:0.5rem; border-top:2px solid var(--border); padding-top:0.75rem;">
+        <span class="detail-label">Total</span><span class="detail-value" style="font-size:1.1rem; font-weight:700;">${fmtMoney(order.total)}</span>
+      </div>
+      <p class="backend-note">Refunds and status changes aren't tracked here yet — process refunds directly in your PayPal account using this order's PayPal ID.</p>
+    `;
+    document.getElementById("order-modal").hidden = false;
+  }
+
+  document.getElementById("modal-close").addEventListener("click", () => {
+    document.getElementById("order-modal").hidden = true;
+  });
+  document.getElementById("order-modal").addEventListener("click", (e) => {
+    if (e.target.id === "order-modal") document.getElementById("order-modal").hidden = true;
+  });
+
+  // ---------------- Products view ----------------
+  function renderProductsTable() {
+    const search = document.getElementById("products-search").value.trim().toLowerCase();
+    const category = document.getElementById("products-category-filter").value;
+    const sort = document.getElementById("products-sort").value;
+
+    const sales = computeBestSellers(ORDERS);
+    const salesById = new Map(sales.map(s => [s.name, s]));
+
+    let list = PRODUCTS.map(p => {
+      const stats = salesById.get(p.name) || { qty: 0, revenue: 0 };
+      return { ...p, unitsSold: stats.qty, revenue: stats.revenue };
+    });
+
+    if (search) list = list.filter(p => p.name.toLowerCase().includes(search));
+    if (category !== "all") list = list.filter(p => p.category === category);
+
+    list.sort((a, b) => {
+      if (sort === "units") return b.unitsSold - a.unitsSold;
+      if (sort === "price-high") return b.price - a.price;
+      if (sort === "price-low") return a.price - b.price;
+      if (sort === "name") return a.name.localeCompare(b.name);
+      return b.revenue - a.revenue;
+    });
+
+    const body = document.querySelector("#products-table tbody");
+    if (list.length === 0) {
+      body.innerHTML = `<tr><td colspan="6" class="admin-empty">No products match your search/filters.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = list.map(p => `
+      <tr onclick="window.location.href='product.html?id=${encodeURIComponent(p.id)}'">
+        <td data-label=""><div class="product-icon product-thumb cat-${p.category}">${ICONS[p.icon] || ""}</div></td>
+        <td data-label="Product" class="cell-primary">${escapeHtml(p.name)}</td>
+        <td data-label="Category"><span class="badge badge-neutral">${CATEGORY_LABELS[p.category] || p.category}</span></td>
+        <td data-label="Price" class="cell-primary">${fmtMoney(p.price)}</td>
+        <td data-label="Units Sold">${p.unitsSold}</td>
+        <td data-label="Revenue" class="cell-primary">${fmtMoney(p.revenue)}</td>
+      </tr>
+    `).join("");
+  }
+
+  ["products-search", "products-category-filter", "products-sort"].forEach(id => {
+    document.getElementById(id).addEventListener("input", renderProductsTable);
+  });
 </script>
 
 </body>
