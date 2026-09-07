@@ -295,6 +295,13 @@ main > h2 {
   margin-bottom: 0.3rem;
 }
 
+.product-tagline {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+
 .product-price {
   color: var(--muted);
   font-weight: 600;
@@ -426,9 +433,38 @@ main > h2 {
   margin-bottom: 1rem;
 }
 
+.product-info .tagline {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+}
+
 .product-info p.description {
   color: var(--muted);
   line-height: 1.55;
+  margin: 0 0 1.25rem;
+}
+
+.highlights {
+  margin-bottom: 1.25rem;
+}
+
+.highlights h3 {
+  font-size: 0.95rem;
+  margin: 0 0 0.6rem;
+}
+
+.highlights ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.product-info .audience {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.9rem;
   margin: 0 0 1.5rem;
 }
 
@@ -710,6 +746,14 @@ main > h2 {
   text-align: center;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.risk-disclaimer {
+  max-width: 640px;
+  margin: 0.6rem auto 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0.75;
 }
 
 /* ---------- Responsive ---------- */

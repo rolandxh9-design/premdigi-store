@@ -40,6 +40,7 @@
 
 <footer class="site-footer">
   <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
+  <p class="risk-disclaimer">Trading involves risk. These products are educational and/or software tools and do not guarantee profits. Past performance, if shown, does not guarantee future results. Only trade with money you can afford to lose.</p>
 </footer>
 
 <script src="js/config.js"></script>
@@ -63,7 +64,19 @@
           <span class="product-badge cat-${product.category}">${CATEGORY_LABELS[product.category] || "Digital Download"}</span>
           <h1>${product.name}</h1>
           <div class="price">$${product.price.toFixed(2)}</div>
+          ${product.tagline ? `<p class="tagline">${product.tagline}</p>` : ""}
           <p class="description">${product.description}</p>
+
+          ${product.highlights && product.highlights.length ? `
+            <div class="highlights">
+              <h3>${product.highlightsTitle || "What's included"}</h3>
+              <ul>
+                ${product.highlights.map(h => `<li>${h}</li>`).join("")}
+              </ul>
+            </div>
+          ` : ""}
+
+          ${product.audience ? `<p class="audience">${product.audience}</p>` : ""}
 
           <div class="purchase-row">
             <div class="qty-stepper">
