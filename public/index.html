@@ -210,10 +210,11 @@
 <script src="js/icons.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/theme.js"></script>
+<script src="js/site.js"></script>
 <script>
   // ---------------- Icons ----------------
-  document.getElementById("search-icon").innerHTML = ICONS.search;
-  document.getElementById("mobile-menu-icon").innerHTML = ICONS.menu;
+  // search-icon/mobile-menu-icon are painted by site.js. Trust-strip icons
+  // are index.html-specific, so they stay here.
   document.getElementById("trust-icon-0").innerHTML = ICONS.shield;
   document.getElementById("trust-icon-1").innerHTML = ICONS.check;
   document.getElementById("trust-icon-2").innerHTML = ICONS.package;
@@ -345,31 +346,23 @@
   `;
 
   // ---------------- Best sellers (only rendered if real sales data exists) ----------------
-  (async function loadBestSellers() {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/bestsellers`);
-      if (!res.ok) return;
-      const sales = await res.json();
-      if (!Array.isArray(sales) || sales.length === 0) return;
+  // loadBestSellerData() (js/site.js) also reveals the footer's Best Sellers
+  // link — this just handles the extra product-grid rendering index.html needs.
+  loadBestSellerData().then(sales => {
+    const top = sales
+      .map(s => ({ ...s, product: PRODUCTS.find(p => p.id === s.productId) }))
+      .filter(s => s.product)
+      .slice(0, 3);
 
-      const top = sales
-        .map(s => ({ ...s, product: PRODUCTS.find(p => p.id === s.productId) }))
-        .filter(s => s.product)
-        .slice(0, 3);
+    if (top.length === 0) return;
 
-      if (top.length === 0) return;
-
-      const section = document.getElementById("bestsellers-section");
-      const bsGrid = document.getElementById("bestsellers-grid");
-      bsGrid.innerHTML = "";
-      top.forEach(s => bsGrid.appendChild(renderProductCard(s.product, { ribbon: "Best Seller" })));
-      wireAddToCartButtons();
-      section.hidden = false;
-      document.getElementById("footer-bestsellers-link").hidden = false;
-    } catch (e) {
-      // Public storefront — fail silently if the endpoint is unreachable.
-    }
-  })();
+    const section = document.getElementById("bestsellers-section");
+    const bsGrid = document.getElementById("bestsellers-grid");
+    bsGrid.innerHTML = "";
+    top.forEach(s => bsGrid.appendChild(renderProductCard(s.product, { ribbon: "Best Seller" })));
+    wireAddToCartButtons();
+    section.hidden = false;
+  });
 
   // ---------------- Why PremDigi ----------------
   document.getElementById("why-grid").innerHTML = `
@@ -460,78 +453,8 @@
     });
   });
 
-  // ---------------- Header search (real, client-side, no fake results) ----------------
-  const searchToggle = document.getElementById("search-toggle");
-  const searchPanel = document.getElementById("search-panel");
-  const searchInput = document.getElementById("site-search-input");
-  const searchResults = document.getElementById("search-results");
-
-  searchToggle.addEventListener("click", () => {
-    const isHidden = searchPanel.hidden;
-    searchPanel.hidden = !isHidden;
-    searchToggle.setAttribute("aria-expanded", String(isHidden));
-    if (isHidden) searchInput.focus();
-  });
-
-  searchInput.addEventListener("input", () => {
-    const q = searchInput.value.trim().toLowerCase();
-    if (!q) {
-      searchResults.hidden = true;
-      searchResults.innerHTML = "";
-      return;
-    }
-    const matches = PRODUCTS.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      (CATEGORY_LABELS[p.category] || "").toLowerCase().includes(q) ||
-      (p.tagline || "").toLowerCase().includes(q)
-    ).slice(0, 6);
-
-    searchResults.hidden = false;
-    if (matches.length === 0) {
-      searchResults.innerHTML = `<div class="search-empty">No products found.</div>`;
-      return;
-    }
-    searchResults.innerHTML = matches.map(p => `
-      <a class="search-result-item" href="product.html?id=${encodeURIComponent(p.id)}">
-        <span class="search-result-icon cat-${p.category}">${ICONS[p.icon] || ""}</span>
-        <span class="search-result-name">${p.name}</span>
-        <span class="search-result-price">$${p.price.toFixed(2)}</span>
-      </a>
-    `).join("");
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!searchPanel.contains(e.target) && e.target !== searchToggle && !searchToggle.contains(e.target)) {
-      searchPanel.hidden = true;
-    }
-  });
-
-  // ---------------- Mobile nav ----------------
-  const mobileNavToggle = document.getElementById("mobile-nav-toggle");
-  const mobileNav = document.getElementById("mobile-nav");
-  mobileNavToggle.addEventListener("click", () => {
-    const isHidden = mobileNav.hidden;
-    mobileNav.hidden = !isHidden;
-    mobileNavToggle.setAttribute("aria-expanded", String(isHidden));
-  });
-  mobileNav.querySelectorAll("a").forEach(a => {
-    a.addEventListener("click", () => { mobileNav.hidden = true; });
-  });
-
-  // ---------------- Scrollspy: highlight active nav link ----------------
-  const navLinks = document.querySelectorAll(".nav-link[data-section]");
-  const sections = ["top", "products", "categories", "faq"].map(id => document.getElementById(id)).filter(Boolean);
-
-  if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          navLinks.forEach(link => link.classList.toggle("active", link.dataset.section === entry.target.id));
-        }
-      });
-    }, { rootMargin: "-40% 0px -55% 0px" });
-    sections.forEach(s => observer.observe(s));
-  }
+  // Header search, mobile nav, and scrollspy are wired up by js/site.js
+  // (shared across index/product/cart pages).
 
   // ---------------- Structured data (real product info only) ----------------
   const structuredData = {

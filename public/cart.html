@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Cart - PremDigi Store</title>
+<title>Your Cart - PremDigi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,17 +20,45 @@
 
 <header class="site-header">
   <div class="header-inner">
-    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi Store</a>
+    <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi</a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <a href="index.html#top" class="nav-link" data-section="top">Home</a>
+      <a href="index.html#products" class="nav-link" data-section="products">Products</a>
+      <a href="index.html#categories" class="nav-link" data-section="categories">Categories</a>
+      <a href="index.html#faq" class="nav-link" data-section="faq">Support</a>
+    </nav>
+
     <div class="header-actions">
+      <button id="search-toggle" class="icon-btn" aria-label="Search products" aria-expanded="false" title="Search">
+        <span id="search-icon" aria-hidden="true"></span>
+      </button>
       <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <span id="theme-icon"></span>
+        <span id="theme-icon" aria-hidden="true"></span>
       </button>
       <a href="cart.html" class="icon-btn cart-btn" aria-label="View cart" title="View cart">
-        <span id="cart-icon"></span>
+        <span id="cart-icon" aria-hidden="true"></span>
         <span id="cart-count" class="cart-badge">0</span>
       </a>
+      <button id="mobile-nav-toggle" class="icon-btn mobile-nav-toggle" aria-label="Open menu" aria-expanded="false" title="Menu">
+        <span id="mobile-menu-icon" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
+
+  <div class="header-search-panel" id="search-panel" hidden>
+    <div class="header-search-inner">
+      <input type="search" id="site-search-input" placeholder="Search products by name or category..." aria-label="Search products" autocomplete="off">
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" hidden aria-label="Mobile">
+    <a href="index.html#top">Home</a>
+    <a href="index.html#products">Products</a>
+    <a href="index.html#categories">Categories</a>
+    <a href="index.html#faq">Support</a>
+  </nav>
 </header>
 
 <main>
@@ -39,9 +67,40 @@
   <div id="cart-content"></div>
 </main>
 
-<footer class="site-footer">
-  <p>&copy; 2026 PremDigi Store. All digital sales are final.</p>
-  <p class="risk-disclaimer">Trading involves risk. These products are educational and/or software tools and do not guarantee profits. Past performance, if shown, does not guarantee future results. Only trade with money you can afford to lose.</p>
+<footer class="site-footer" style="padding:0;">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="logo"><span class="logo-mark">&#9670;</span> PremDigi</a>
+      <p>Digital trading resources — e-books, courses, and automated bots for crypto and forex, with secure PayPal checkout.</p>
+    </div>
+    <div class="footer-col">
+      <h3>Shop</h3>
+      <ul>
+        <li><a href="index.html#products">Products</a></li>
+        <li><a href="index.html#categories">Categories</a></li>
+        <li><a href="index.html#bestsellers-section" id="footer-bestsellers-link" hidden>Best Sellers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Support</h3>
+      <ul>
+        <li><a href="index.html#faq">FAQ</a></li>
+        <li><a href="cart.html">Your Cart</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="refund-policy.html">Refund Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p style="margin:0 0 0.5rem;">&copy; 2026 PremDigi Store. All digital sales are final.</p>
+    <p class="risk-disclaimer">Trading involves risk. These products are educational and/or software tools and do not guarantee profits. Past performance, if shown, does not guarantee future results. Only trade with money you can afford to lose.</p>
+  </div>
 </footer>
 
 <script src="js/config.js"></script>
@@ -49,7 +108,10 @@
 <script src="js/icons.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/theme.js"></script>
+<script src="js/site.js"></script>
 <script>
+  loadBestSellerData(); // reveals the footer's Best Sellers link if real sales exist
+
   // "sb" is PayPal's public sandbox client ID, for testing only.
   // Replace it with your own Client ID from https://developer.paypal.com/dashboard/applications
   // before accepting real payments.
