@@ -1,5 +1,59 @@
 /* Admin panel — extends the design tokens in style.css with dashboard-only
-   components (sidebar, stat cards, data tables, badges, modal, charts). */
+   components (sidebar, stat cards, data tables, badges, modal, charts).
+   This file is pure presentation: no selector here is toggled by JS logic
+   except the pre-existing state hooks (.open, .active, [hidden]), which
+   keep their exact meaning — only their appearance changes below. */
+
+:root {
+  /* Layered surfaces: base app background < card surface < elevated surface */
+  --surface-2: #ffffff;
+  --surface-hover: rgba(20, 20, 30, 0.03);
+  --border-soft: rgba(20, 20, 30, 0.07);
+  --glow-accent: rgba(79, 70, 229, 0.08);
+  --glow-accent-2: rgba(37, 99, 235, 0.06);
+
+  --shadow-xs: 0 1px 2px rgba(20, 20, 30, 0.04);
+  --shadow-sm: 0 2px 8px rgba(20, 20, 30, 0.05), 0 1px 2px rgba(20, 20, 30, 0.04);
+  --shadow-md: 0 8px 24px rgba(20, 20, 30, 0.08), 0 2px 6px rgba(20, 20, 30, 0.04);
+  --shadow-lg: 0 20px 48px rgba(20, 20, 30, 0.14), 0 6px 16px rgba(20, 20, 30, 0.06);
+  --ring-accent: 0 0 0 3px rgba(79, 70, 229, 0.14);
+
+  --stat-accent: var(--accent);
+  --stat-accent-soft: var(--accent-soft);
+  --stat-info: #2563eb;
+  --stat-info-soft: #dce9fe;
+  --stat-purple: #7c3aed;
+  --stat-purple-soft: #ebe4fd;
+}
+
+:root[data-theme="dark"] {
+  --surface-2: #1f222b;
+  --surface-hover: rgba(255, 255, 255, 0.035);
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --glow-accent: rgba(109, 100, 247, 0.14);
+  --glow-accent-2: rgba(63, 214, 195, 0.06);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.32), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.4), 0 3px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 28px 64px rgba(0, 0, 0, 0.55), 0 8px 20px rgba(0, 0, 0, 0.35);
+  --ring-accent: 0 0 0 3px rgba(109, 100, 247, 0.28);
+
+  --stat-info: #6ca4fb;
+  --stat-info-soft: #1c2c47;
+  --stat-purple: #b39bfb;
+  --stat-purple-soft: #2b2247;
+}
+
+/* ---------- Page background: subtle layered glow ---------- */
+
+body:has(.admin-app, .admin-login-screen) {
+  background:
+    radial-gradient(1100px circle at 12% -8%, var(--glow-accent), transparent 55%),
+    radial-gradient(900px circle at 100% 0%, var(--glow-accent-2), transparent 50%),
+    var(--bg);
+  background-attachment: fixed;
+}
 
 /* ---------- Login screen ---------- */
 
@@ -14,11 +68,11 @@
 .admin-login-card {
   width: 100%;
   max-width: 380px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
   border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: 0 20px 40px var(--shadow-strong);
+  box-shadow: var(--shadow-lg);
 }
 
 .admin-login-logo {
@@ -37,12 +91,30 @@
 .admin-login-card h1 {
   font-size: 1.3rem;
   margin: 0 0 0.4rem;
+  letter-spacing: -0.01em;
 }
 
 .admin-login-card > p {
   color: var(--muted);
   font-size: 0.88rem;
   margin: 0 0 1.5rem;
+}
+
+#login-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring-accent);
+}
+
+.admin-login-card .btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  box-shadow: var(--shadow-sm), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.admin-login-card .btn-primary:hover {
+  filter: brightness(1.05);
+  box-shadow: var(--shadow-md);
 }
 
 /* ---------- App shell ---------- */
@@ -60,8 +132,9 @@
 .admin-sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: var(--surface-2);
+  border-right: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -69,49 +142,54 @@
   bottom: 0;
   left: 0;
   z-index: 30;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .admin-sidebar-header {
   padding: 1.35rem 1.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 700;
   font-size: 1.05rem;
+  letter-spacing: -0.01em;
 }
 
 .admin-sidebar-header .logo-mark {
   color: var(--accent);
+  filter: drop-shadow(0 0 6px var(--glow-accent));
 }
 
 .admin-nav {
   flex: 1;
-  padding: 1rem 0.75rem;
+  padding: 1.1rem 0.75rem;
   overflow-y: auto;
 }
 
 .admin-nav-section {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
 }
 
 .admin-nav-label {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   font-weight: 700;
   color: var(--muted);
   padding: 0 0.6rem;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.75;
 }
 
 .admin-nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.7rem;
   width: 100%;
-  padding: 0.6rem 0.7rem;
+  padding: 0.6rem 0.7rem 0.6rem 0.85rem;
+  margin-bottom: 0.1rem;
   border-radius: 8px;
   border: none;
   background: none;
@@ -122,7 +200,7 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .admin-nav-item svg {
@@ -130,16 +208,30 @@
   height: 18px;
   flex-shrink: 0;
   color: var(--muted);
-  transition: color 0.12s ease;
+  transition: color 0.15s ease;
 }
 
 .admin-nav-item:hover {
-  background: var(--bg);
+  background: var(--surface-hover);
 }
 
 .admin-nav-item.active {
-  background: var(--accent-soft);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 130%);
   color: var(--accent);
+  font-weight: 600;
+}
+
+.admin-nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 58%;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--glow-accent), 0 0 2px var(--accent);
 }
 
 .admin-nav-item.active svg {
@@ -168,7 +260,11 @@
 
 .admin-sidebar-footer {
   padding: 0.75rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-soft);
+}
+
+.admin-sidebar-footer .admin-nav-item:hover {
+  background: var(--surface-hover);
 }
 
 .admin-main {
@@ -183,8 +279,10 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-2) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-xs);
   padding: 1rem 1.75rem;
   display: flex;
   align-items: center;
@@ -192,7 +290,9 @@
 }
 
 .admin-topbar h1 {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   margin: 0;
   flex: 1;
 }
@@ -214,6 +314,15 @@
   display: none;
 }
 
+.admin-view {
+  animation: view-fade-in 0.2s ease;
+}
+
+@keyframes view-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ---------- Stat cards ---------- */
 
 .stat-grid {
@@ -224,25 +333,69 @@
 }
 
 .stat-card {
+  position: relative;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 1.3rem 1.4rem 1.4rem;
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--stat-tint, var(--accent)), transparent 85%);
+  opacity: 0.9;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border);
+}
+
+.stat-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.9rem;
+  background: var(--stat-tint-soft, var(--accent-soft));
+  color: var(--stat-tint, var(--accent));
+}
+
+.stat-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.stat-card.tint-accent { --stat-tint: var(--stat-accent); --stat-tint-soft: var(--stat-accent-soft); }
+.stat-card.tint-success { --stat-tint: var(--success); --stat-tint-soft: var(--success-soft); }
+.stat-card.tint-info { --stat-tint: var(--stat-info); --stat-tint-soft: var(--stat-info-soft); }
+.stat-card.tint-purple { --stat-tint: var(--stat-purple); --stat-tint-soft: var(--stat-purple-soft); }
 
 .stat-card .stat-label {
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
 }
 
 .stat-card .stat-value {
-  font-size: 1.55rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
 .stat-card .stat-sub {
@@ -255,9 +408,10 @@
 
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
   padding: 1.5rem;
+  box-shadow: var(--shadow-xs);
 }
 
 .card-header {
@@ -269,7 +423,9 @@
 }
 
 .card-header h2 {
-  font-size: 1rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -283,9 +439,9 @@
 
 .range-tabs {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.2rem;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-soft);
   border-radius: 8px;
   padding: 0.2rem;
 }
@@ -297,15 +453,20 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--muted);
-  padding: 0.3rem 0.6rem;
+  padding: 0.32rem 0.65rem;
   border-radius: 6px;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.range-tabs button:hover {
+  color: var(--text);
 }
 
 .range-tabs button.active {
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--text);
-  box-shadow: 0 1px 2px var(--shadow);
+  box-shadow: var(--shadow-xs);
 }
 
 .chart-container {
@@ -323,13 +484,21 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  padding: 0.35rem;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.best-seller-row:hover {
+  background: var(--surface-hover);
 }
 
 .best-seller-rank {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--bg);
+  border: 1px solid var(--border-soft);
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 700;
@@ -337,6 +506,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.best-seller-row.is-top .best-seller-rank {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow-accent);
 }
 
 .best-seller-info {
@@ -374,13 +550,15 @@
 
 .admin-toolbar input[type="search"],
 .admin-toolbar select {
-  padding: 0.55rem 0.8rem;
+  padding: 0.6rem 0.85rem;
   border-radius: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-soft);
   background: var(--surface);
   color: var(--text);
   font-family: inherit;
   font-size: 0.85rem;
+  box-shadow: var(--shadow-xs);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .admin-toolbar input[type="search"] {
@@ -392,14 +570,16 @@
 .admin-toolbar select:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: var(--ring-accent);
 }
 
 /* ---------- Data table ---------- */
 
 .data-table-wrapper {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  box-shadow: var(--shadow-xs);
   overflow-x: auto;
 }
 
@@ -411,19 +591,28 @@ table.data-table {
 
 table.data-table th {
   text-align: left;
-  font-size: 0.72rem;
+  font-size: 0.71rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--muted);
   font-weight: 700;
-  padding: 0.85rem 1.1rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-hover);
   white-space: nowrap;
 }
 
+table.data-table th:first-child {
+  border-top-left-radius: 14px;
+}
+
+table.data-table th:last-child {
+  border-top-right-radius: 14px;
+}
+
 table.data-table td {
-  padding: 0.85rem 1.1rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border-soft);
   vertical-align: middle;
 }
 
@@ -432,18 +621,20 @@ table.data-table tbody tr:last-child td {
 }
 
 table.data-table tbody tr {
+  position: relative;
   cursor: pointer;
-  transition: background 0.1s ease;
+  transition: background 0.12s ease;
 }
 
 table.data-table tbody tr:hover {
-  background: var(--bg);
+  background: var(--surface-hover);
 }
 
 .product-thumb {
   width: 36px !important;
   height: 36px !important;
   margin: 0 !important;
+  box-shadow: var(--shadow-xs);
 }
 
 .product-thumb svg {
@@ -465,14 +656,23 @@ table.data-table tbody tr:hover {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.72rem;
+  gap: 0.35rem;
+  font-size: 0.71rem;
   font-weight: 700;
-  padding: 0.22rem 0.6rem;
+  padding: 0.24rem 0.65rem 0.24rem 0.55rem;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   white-space: nowrap;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  box-shadow: 0 0 4px currentColor;
 }
 
 .badge-success {
@@ -493,7 +693,7 @@ table.data-table tbody tr:hover {
 .badge-neutral {
   background: var(--bg);
   color: var(--muted);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-soft);
 }
 
 /* ---------- Empty / loading states ---------- */
@@ -528,27 +728,40 @@ table.data-table tbody tr:hover {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(10, 10, 15, 0.5);
+  background: rgba(10, 10, 15, 0.55);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
   z-index: 50;
+  animation: modal-backdrop-in 0.15s ease;
 }
 
 .modal-backdrop[hidden] {
   display: none;
 }
 
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .modal-panel {
-  background: var(--surface);
-  border-radius: 14px;
-  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
   max-width: 520px;
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 24px 48px var(--shadow-strong);
+  box-shadow: var(--shadow-lg);
+  animation: modal-panel-in 0.18s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes modal-panel-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modal-header {
@@ -556,21 +769,34 @@ table.data-table tbody tr:hover {
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .modal-header h2 {
   font-size: 1.05rem;
+  font-weight: 700;
   margin: 0;
 }
 
 .modal-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
   background: none;
   border: none;
   color: var(--muted);
   font-size: 1.3rem;
   line-height: 1;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.modal-close:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
 .modal-body {
@@ -581,8 +807,8 @@ table.data-table tbody tr:hover {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border);
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border-soft);
   font-size: 0.88rem;
 }
 
@@ -619,7 +845,7 @@ table.data-table tbody tr:hover {
 }
 
 .backend-note {
-  background: var(--bg);
+  background: var(--surface-hover);
   border: 1px dashed var(--border);
   border-radius: 10px;
   padding: 0.9rem 1.1rem;
@@ -643,7 +869,7 @@ table.data-table tbody tr:hover {
 
   .admin-sidebar.open {
     transform: translateX(0);
-    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0);
+    box-shadow: var(--shadow-lg);
   }
 
   .admin-main {
@@ -657,10 +883,15 @@ table.data-table tbody tr:hover {
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-soft);
     background: var(--surface);
     color: var(--text);
     cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .sidebar-toggle:hover {
+    background: var(--surface-hover);
   }
 
   .sidebar-toggle svg {
@@ -672,8 +903,10 @@ table.data-table tbody tr:hover {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(10, 10, 15, 0.45);
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(2px);
     z-index: 25;
+    animation: modal-backdrop-in 0.2s ease;
   }
 
   table.data-table thead {
@@ -690,7 +923,7 @@ table.data-table tbody tr:hover {
 
   table.data-table tr {
     padding: 0.9rem 1.1rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-soft);
   }
 
   table.data-table td {

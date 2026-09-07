@@ -429,19 +429,30 @@
     renderProductsTable();
   }
 
+  function statCard(tint, icon, label, value, sub) {
+    return `
+      <div class="stat-card tint-${tint}">
+        <div class="stat-icon">${ICONS[icon] || ""}</div>
+        <div class="stat-label">${label}</div>
+        <div class="stat-value">${value}</div>
+        ${sub ? `<div class="stat-sub">${sub}</div>` : ""}
+      </div>
+    `;
+  }
+
   function renderDashboard() {
     const m = computeMetrics(ORDERS);
     const statGrid = document.getElementById("stat-grid");
-    statGrid.innerHTML = `
-      <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value">${fmtMoney(m.totalRevenue)}</div></div>
-      <div class="stat-card"><div class="stat-label">Revenue Today</div><div class="stat-value">${fmtMoney(m.revenueToday)}</div></div>
-      <div class="stat-card"><div class="stat-label">Revenue This Month</div><div class="stat-value">${fmtMoney(m.revenueMonth)}</div></div>
-      <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value">${m.totalOrders}</div><div class="stat-sub">${m.ordersToday} today</div></div>
-      <div class="stat-card"><div class="stat-label">Total Customers</div><div class="stat-value">${m.totalCustomers}</div></div>
-      <div class="stat-card"><div class="stat-label">Avg. Order Value</div><div class="stat-value">${fmtMoney(m.avgOrderValue)}</div></div>
-      <div class="stat-card"><div class="stat-label">Products</div><div class="stat-value">${PRODUCTS.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Units Sold</div><div class="stat-value">${m.unitsSold}</div></div>
-    `;
+    statGrid.innerHTML = [
+      statCard("accent", "coins", "Total Revenue", fmtMoney(m.totalRevenue)),
+      statCard("success", "trending-up", "Revenue Today", fmtMoney(m.revenueToday)),
+      statCard("success", "trending-up", "Revenue This Month", fmtMoney(m.revenueMonth)),
+      statCard("info", "receipt", "Total Orders", m.totalOrders, `${m.ordersToday} today`),
+      statCard("purple", "users", "Total Customers", m.totalCustomers),
+      statCard("accent", "coins", "Avg. Order Value", fmtMoney(m.avgOrderValue)),
+      statCard("info", "box", "Products", PRODUCTS.length),
+      statCard("purple", "tag", "Units Sold", m.unitsSold)
+    ].join("");
 
     renderChart(currentRange);
 
@@ -451,7 +462,7 @@
       bestSellersEl.innerHTML = `<div class="admin-empty">No sales yet.</div>`;
     } else {
       bestSellersEl.innerHTML = bestSellers.map((p, i) => `
-        <div class="best-seller-row">
+        <div class="best-seller-row${i === 0 ? " is-top" : ""}">
           <div class="best-seller-rank">${i + 1}</div>
           <div class="best-seller-info">
             <div class="best-seller-name">${escapeHtml(p.name)}</div>
@@ -472,7 +483,7 @@
           <td data-label="Order" class="cell-primary orders-id">${escapeHtml(o.id)}</td>
           <td data-label="Customer">${escapeHtml(o.payerName || "—")}</td>
           <td data-label="Total" class="cell-primary">${fmtMoney(o.total)}</td>
-          <td data-label="Status"><span class="badge badge-success">Paid</span></td>
+          <td data-label="Status"><span class="badge badge-success"><span class="badge-dot"></span>Paid</span></td>
           <td data-label="Date" class="cell-muted">${new Date(o.createdAt).toLocaleDateString()}</td>
         </tr>
       `).join("");
@@ -485,10 +496,18 @@
       return;
     }
     const { labels, data } = bucketRevenue(ORDERS, range);
-    const ctx = document.getElementById("revenue-chart").getContext("2d");
-    const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
-    const gridColor = getComputedStyle(document.documentElement).getPropertyValue("--border").trim();
-    const textColor = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim();
+    const canvas = document.getElementById("revenue-chart");
+    const ctx = canvas.getContext("2d");
+    const style = getComputedStyle(document.documentElement);
+    const accent = style.getPropertyValue("--accent").trim();
+    const gridColor = style.getPropertyValue("--border-soft").trim() || style.getPropertyValue("--border").trim();
+    const textColor = style.getPropertyValue("--muted").trim();
+    const surfaceColor = style.getPropertyValue("--surface-2").trim() || style.getPropertyValue("--surface").trim();
+    const bodyColor = style.getPropertyValue("--text").trim();
+
+    const gradientFill = ctx.createLinearGradient(0, 0, 0, 240);
+    gradientFill.addColorStop(0, accent + "38");
+    gradientFill.addColorStop(1, accent + "00");
 
     if (revenueChart) revenueChart.destroy();
     revenueChart = new Chart(ctx, {
@@ -498,20 +517,38 @@
         datasets: [{
           data,
           borderColor: accent,
-          backgroundColor: accent + "22",
+          backgroundColor: gradientFill,
           fill: true,
-          tension: 0.3,
+          tension: 0.35,
           pointRadius: 0,
-          borderWidth: 2
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: accent,
+          pointHoverBorderColor: surfaceColor,
+          pointHoverBorderWidth: 2,
+          borderWidth: 2.5
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => fmtMoney(ctx.parsed.y) } } },
+        interaction: { intersect: false, mode: "index" },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: surfaceColor,
+            titleColor: bodyColor,
+            bodyColor: bodyColor,
+            borderColor: gridColor,
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 8,
+            displayColors: false,
+            callbacks: { label: (ctx) => fmtMoney(ctx.parsed.y) }
+          }
+        },
         scales: {
-          x: { grid: { display: false }, ticks: { color: textColor, maxTicksLimit: 8 } },
-          y: { grid: { color: gridColor }, ticks: { color: textColor, callback: (v) => "$" + v } }
+          x: { grid: { display: false }, border: { color: gridColor }, ticks: { color: textColor, maxTicksLimit: 8 } },
+          y: { grid: { color: gridColor }, border: { display: false }, ticks: { color: textColor, callback: (v) => "$" + v } }
         }
       }
     });
@@ -581,7 +618,7 @@
           </td>
           <td data-label="Items" class="cell-muted">${itemsLabel}</td>
           <td data-label="Total" class="cell-primary">${fmtMoney(o.total)}</td>
-          <td data-label="Status"><span class="badge badge-success">Paid</span></td>
+          <td data-label="Status"><span class="badge badge-success"><span class="badge-dot"></span>Paid</span></td>
           <td data-label="Date" class="cell-muted">${new Date(o.createdAt).toLocaleString()}</td>
         </tr>
       `;
@@ -601,7 +638,7 @@
       <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${new Date(order.createdAt).toLocaleString()}</span></div>
       <div class="detail-row"><span class="detail-label">Customer</span><span class="detail-value">${escapeHtml(order.payerName || "—")}</span></div>
       <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${escapeHtml(order.payerEmail || "—")}</span></div>
-      <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge badge-success">Paid</span></span></div>
+      <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="badge badge-success"><span class="badge-dot"></span>Paid</span></span></div>
       <div class="detail-items">
         <div class="detail-label" style="margin-bottom:0.5rem;">Items</div>
         ${(order.items || []).map(i => `
