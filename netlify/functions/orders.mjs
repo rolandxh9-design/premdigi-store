@@ -72,5 +72,27 @@ export default async (req) => {
     });
   }
 
+  if (req.method === "DELETE") {
+    if (!isValidAdminAuth(authHeader)) {
+      return new Response("Authentication required.", {
+        status: 401,
+        headers: { "WWW-Authenticate": 'Basic realm="PremDigi Admin"' }
+      });
+    }
+    const id = new URL(req.url).searchParams.get("id");
+    if (!id) {
+      return new Response(JSON.stringify({ error: "Missing order id." }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    const store = getStore(BLOB_STORE_NAME);
+    await store.delete(id);
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
   return new Response("Method not allowed", { status: 405 });
 };

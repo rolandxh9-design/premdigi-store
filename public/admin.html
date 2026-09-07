@@ -615,8 +615,36 @@
         <span class="detail-label">Total</span><span class="detail-value" style="font-size:1.1rem; font-weight:700;">${fmtMoney(order.total)}</span>
       </div>
       <p class="backend-note">Refunds and status changes aren't tracked here yet — process refunds directly in your PayPal account using this order's PayPal ID.</p>
+      <button id="delete-order-btn" class="btn btn-secondary" style="width:100%; margin-top:1rem; color:var(--danger); border-color:var(--danger-soft);" data-id="${escapeHtml(order.id)}">Delete Order Record</button>
     `;
     document.getElementById("order-modal").hidden = false;
+
+    const deleteBtn = document.getElementById("delete-order-btn");
+    deleteBtn.addEventListener("click", () => {
+      if (deleteBtn.dataset.confirming) {
+        deleteOrder(deleteBtn.dataset.id);
+      } else {
+        deleteBtn.dataset.confirming = "1";
+        deleteBtn.textContent = "Click again to confirm delete";
+      }
+    });
+  }
+
+  async function deleteOrder(id) {
+    const authHeader = getStoredAuth();
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/orders?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: { Authorization: authHeader }
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      ORDERS = ORDERS.filter(o => o.id !== id);
+      document.getElementById("order-modal").hidden = true;
+      renderAll();
+    } catch (e) {
+      const btn = document.getElementById("delete-order-btn");
+      if (btn) btn.textContent = "Failed to delete — try again";
+    }
   }
 
   document.getElementById("modal-close").addEventListener("click", () => {
